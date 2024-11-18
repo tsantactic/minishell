@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 14:44:02 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/14 15:59:20 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/18 14:20:02 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ void	ft_execute_command(t_cmd *cmd, char *path, char **my_t_cmd, char **envp)
 				}
 				else if (is_not_cmd == 2 && !is_not_dir)
 				{
-					ft_putstr_fd(":command not foundd\n", 2);
+					ft_putstr_fd(":command not found\n", 2);
 				}
 				else
 					ft_putstr_fd(": Is a directory\n", 2);
@@ -182,20 +182,9 @@ void	ft_execute_command(t_cmd *cmd, char *path, char **my_t_cmd, char **envp)
 				ft_putstr_fd(": Is a directory\n", 2);
 			}
 		}
-		int j = 0;
-		while (j < cmd->len_arg)
-		{
-			free(cmd->token_arg[j]);
-			j++;
-		}
-		free(cmd->token_arg);
-		cmd->token_arg = NULL;
-		free_tokens(cmd);
+		free_token_list(cmd);
 		ft_free(my_t_cmd);
 		free(path);
-		int i = 0;
-		while (cmd->args[i] != NULL)
-			free(cmd->args[i++]);
-		free(cmd->args);
+		ft_free(cmd->args);
 	}
 }

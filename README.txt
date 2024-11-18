@@ -72,3 +72,100 @@ bash: syntax error near unexpected token `<'
 > 
 bash: warning: here-document at line 11 delimited by end-of-file (wanted `eof')
 cat Makefile | grep -i name |
+
+void redir_exec(t_cmd *cmd, char **envp)
+{
+    int i = 0;
+    char **my_t_cmd = NULL;
+    int len_command = 0;
+    char *path = NULL;
+    char *command = NULL;
+    int count_herdoc = 0;
+    i = 0;
+    while (i < cmd->len_tokens)
+    {
+        if (cmd->tokens[i]->type == REDIR_HEREDOC)
+            count_herdoc++;
+        i++;
+    }
+    int heredoc_file_fd = open("filemy.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    i = 0;
+    while (i < cmd->len_tokens)
+    {  
+        if (cmd->tokens[i]->type == CMD || cmd->tokens[i]->type == ARG)
+            len_command++;
+
+        if (cmd->tokens[i]->type == REDIR_HEREDOC)
+        {
+            char *delimiter = cmd->tokens[i + 1]->value;
+            loop_heredoc(delimiter, heredoc_file_fd);
+            i += 1;
+        }
+        i++;
+    }
+    
+    my_t_cmd = malloc(sizeof(char *) * (len_command + 1));
+    if (!my_t_cmd)
+    {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+    command = copy_command_arg(cmd, my_t_cmd, command);
+    int k = 0;
+    while (k < cmd->len_tokens)
+    {
+        if (cmd->tokens[k]->type == REDIR_OUT)
+        {
+            int fd = open(cmd->tokens[k + 1]->value, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+            if (fd < 0)
+            {
+                perror(cmd->tokens[k + 1]->value);
+                exit(EXIT_FAILURE);
+            }
+            dup2(fd, 1);
+            close(fd);
+            k++;
+        }
+        if (cmd->tokens[k]->type == REDIR_IN)
+        {
+            int fd = open(cmd->tokens[k + 1]->value, O_RDONLY);
+            if (fd < 0)
+            {
+                perror(cmd->tokens[k + 1]->value);
+                exit(EXIT_FAILURE);
+            }
+            dup2(fd, 0);
+            close(fd);
+            k++;
+        }
+        if (cmd->tokens[k]->type == REDIR_OUTPUT_APPEND)
+        {
+            int fd = open(cmd->tokens[k + 1]->value, O_WRONLY | O_APPEND | O_CREAT, 0777);
+            if (fd < 0)
+            {
+                perror(cmd->tokens[k + 1]->value);
+                exit(EXIT_FAILURE);
+            }
+            dup2(fd, 1);
+            close(fd);
+            k++;
+        }
+        k++;
+    }
+    dup2(heredoc_file_fd, 0);
+    close(heredoc_file_fd);
+    if (command)
+    {
+        path = ft_find_path(command, envp);
+        ft_execute_command(cmd, path, my_t_cmd, envp);
+        free(command);
+        free(path);
+    }
+    free_token_list(cmd);
+    ft_free(cmd->args);
+    ft_free(my_t_cmd);
+    unlink("filemy.tmp");
+    exit(0);
+}
+
+

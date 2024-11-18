@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executions.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42.fr>          +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 14:34:15 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/13 10:21:51 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/18 18:40:36 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,5 +23,7 @@ char	*ft_find_path(char *t_cmd, char **envp);
 void	ft_execute_command(t_cmd *cmd, char *path, char **my_t_cmd, char **envp);
 void    fork_exec(t_cmd *cmd, char *envp[]);
 void     execute_with_pipes(t_cmd *cmd, char *env[]);
-void redir_exec(t_cmd *cmd, char **envp);
+void    redir_exec(t_cmd *cmd, char **envp);
+void loop_heredoc(char *delimiter, int *pipefd);
+char *copy_command_arg(t_cmd *cmd, char **my_t_cmd, char *command);
 #endif

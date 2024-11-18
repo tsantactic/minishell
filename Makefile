@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -Werror
 SRCS =	srcs/minishell.c srcs/parsing.c srcs/utils_functions.c \
 		srcs/parsing_utils.c srcs/stock_args.c srcs/lexing.c srcs/type_args.c \
 		srcs/remove_and_expand.c srcs/execution_command.c srcs/execution_utils.c \
-		srcs/pipe_normal.c srcs/syntax.c srcs/redir_exec.c
+		srcs/pipe_normal.c srcs/syntax.c srcs/redir_exec.c srcs/redir_utils.c
 OBJS = $(SRCS:.c=.o)
 all: $(LIBFT) $(NAME)
 LIBFT_DIR = Libft

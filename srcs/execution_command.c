@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/09 15:55:10 by tambinin          #+#    #+#             */
-/*   Updated: 2024/11/14 17:30:13 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/18 10:29:52 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void print_commands(t_cmd *cmd)
     {
         j = 0;
         printf("%ld command: ", i);
-        while (cmd->commands_arg[i][j] && cmd->commands_arg[i][j]->value) // Vérifie la validité des pointeurs
+        while (cmd->commands_arg[i][j] && cmd->commands_arg[i][j]->value)
         {
             printf("%s (type %d)", cmd->commands_arg[i][j]->value,cmd->commands_arg[i][j]->type);
             j++;
@@ -98,6 +98,23 @@ void print_commands(t_cmd *cmd)
     }
 }
 
+void free_commands(t_cmd *cmd)
+{
+    size_t i = 0;
+    int j = 0;
+
+    while (i <= cmd->nb_pipe)
+    {
+        j = 0;
+        while (cmd->commands_arg[i][j]) 
+        {
+            free(cmd->commands_arg[i][j]);
+            j++;
+        }
+        free(cmd->commands_arg[i]);
+        i++;
+    }
+}
 /*execute with pipe*/ /*si on a ls | ls -a | ls << e on met dans une variable de cmd [ls] dans un autre [ls] [-a] dans un autre [ls]*/
 void execute_with_pipes(t_cmd *cmd, char *env[])
 {
@@ -136,6 +153,8 @@ void execute_with_pipes(t_cmd *cmd, char *env[])
     cmd->commands_arg[j][k] = NULL;
 
     print_commands(cmd);
+    free_commands(cmd);
+    free(cmd->commands_arg);
     free_token_list(cmd);
 }
 
@@ -187,9 +206,7 @@ void execute_all(t_cmd *cmd, char *envp[])
             if (!my_t_cmd[j])
             {
                 perror("strdup");
-                for (int k = 0; k < j; k++)
-                    free(my_t_cmd[k]);
-                free(my_t_cmd);
+                ft_free(my_t_cmd);
                 free_token_list(cmd);
                 exit(EXIT_FAILURE);
             }
@@ -202,6 +219,9 @@ void execute_all(t_cmd *cmd, char *envp[])
     my_t_cmd[j] = NULL;
     if (contains_redirection(my_t_cmd, len))
     {
+        for (int k = 0; k < j; k++)
+            free(my_t_cmd[k]);
+        free(my_t_cmd);
         redir_exec(cmd, envp);
     }
     if (command && !is_builtin(command) && !contains_bin(command) && !contains_redirection(my_t_cmd, len))
@@ -215,27 +235,6 @@ void execute_all(t_cmd *cmd, char *envp[])
         /*utiliser cmd->len_tokens, cmd->tokens[i]->value, cmd->tokens[i]->type*/
         printf("%d\n", cmd->len_tokens);
         printf("%s type :%d\n",cmd->tokens[0]->value,cmd->tokens[0]->type);
-        if (is_builtin(command) == 6)
-        {
-            j = 0;
-            while (j < cmd->len_arg)
-            {
-                free(cmd->token_arg[j]);
-                j++;
-            }
-            free(cmd->token_arg);
-            cmd->token_arg = NULL;
-            i = 0;
-            while (cmd->args[i] != NULL)
-                free(cmd->args[i++]);
-            free(cmd->args);
-            free_tokens(cmd);
-            for (int k = 0; k < j; k++)
-                free(my_t_cmd[k]);
-            free(my_t_cmd);
-            write(2,"exit\n",5);
-            exit(0);
-        }
         write(2,"\n*is builtins*\n",15);
     }
     else if (command && contains_bin(command) && !contains_redirection(my_t_cmd, len))
@@ -247,20 +246,8 @@ void execute_all(t_cmd *cmd, char *envp[])
         ft_execute_command(cmd, path, my_t_cmd, envp);
         exit(1);
     }
-    j = 0;
-    while (j < cmd->len_tokens)
-    {
-        free(cmd->token_arg[j]);
-        j++;
-    }
-    free(cmd->token_arg);
-    cmd->token_arg = NULL;
-    i = 0;
-    while (cmd->args[i] != NULL)
-        free(cmd->args[i++]);
-    free(cmd->args);
+    free_token_list(cmd);
+    ft_free(cmd->args);
     free_tokens(cmd);
-    for (int k = 0; k < j; k++)
-        free(my_t_cmd[k]);
-    free(my_t_cmd);
+    ft_free(my_t_cmd);
 }

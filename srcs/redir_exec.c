@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 13:44:18 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/14 17:26:03 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/18 18:50:20 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,59 +15,45 @@
 /*et */
 /*d'utiliser char **args dans le structure de cmd : cmd->args*/
 /*ls -a << e > a*/
-
 void redir_exec(t_cmd *cmd, char **envp)
 {
     int i = 0;
-    char *input = NULL;
     char **my_t_cmd = NULL;
     int len_command = 0;
     char *path = NULL;
     char *command = NULL;
     i = 0;
+    int **pipe_heredoc;
+    int count_heredoc = 0;
+    for (int i = 0; i < cmd->len_tokens; i++)
+        if (cmd->tokens[i]->type == REDIR_HEREDOC)
+            count_heredoc++;
+
+    pipe_heredoc = malloc(sizeof(int *) * count_heredoc);
+    for (int i = 0; i < count_heredoc; i++)
+        pipe_heredoc[i] = malloc(sizeof(int) * 2);
+
+    int heredoc_index = 0;
+
     while (i < cmd->len_tokens)
     {  
         if (cmd->tokens[i]->type == CMD || cmd->tokens[i]->type == ARG)
             len_command++;
-
         if (cmd->tokens[i]->type == REDIR_HEREDOC)
         {
-            pid_t pid;
             char *delimiter = cmd->tokens[i + 1]->value;
-            int pipefd[2];
-            pipe(pipefd);
-            pid = fork();
-            if (pid == 0)
-            {
-                while (1)
-                {
-                    input = readline("heredoc>");
-                    if (!input)
-                        break;
-                    if (ft_strcmp(input, delimiter) == 0)
-                    {
-                        free(input);
-                        close(pipefd[1]);
-                        break;
-                    }
-                    write(pipefd[1],input,ft_strlen(input));
-                    write(pipefd[1],"\n",1);
-                    free(input);
-                }
-                close(pipefd[1]);
-                close(pipefd[0]);
-                exit(0);
-            }
-            else
-            {
-                waitpid(pid, NULL, 0);
-                close(pipefd[1]);
-                dup2(pipefd[0], 0);
-                close(pipefd[0]);    
-            }
+            pipe(pipe_heredoc[heredoc_index]);
+            loop_heredoc(delimiter, pipe_heredoc[heredoc_index]);
+            heredoc_index++;
             i += 1;
         }
         i++;
+    }
+    if (count_heredoc > 0)
+    {
+        dup2(pipe_heredoc[count_heredoc - 1][0], STDIN_FILENO);
+        close(pipe_heredoc[count_heredoc - 1][0]);
+        close(pipe_heredoc[count_heredoc - 1][1]);
     }
     my_t_cmd = malloc(sizeof(char *) * (len_command + 1));
     if (!my_t_cmd)
@@ -75,20 +61,8 @@ void redir_exec(t_cmd *cmd, char **envp)
         perror("malloc");
         exit(EXIT_FAILURE);
     }
-    int j = 0;
+    command = copy_command_arg(cmd, my_t_cmd, command);
     int k = 0;
-    while (k < cmd->len_tokens)
-    {
-        if (cmd->tokens[k]->type == ARG || cmd->tokens[k]->type == CMD)
-        {
-            if (cmd->tokens[k]->type == CMD)
-                command = ft_strdup(cmd->tokens[k]->value);
-            my_t_cmd[j++] = ft_strdup(cmd->tokens[k]->value);
-        }
-        k++;
-    }
-    my_t_cmd[j] = NULL;
-    k = 0;
     while (k < cmd->len_tokens)
     {
         if (cmd->tokens[k]->type == REDIR_OUT)
@@ -129,12 +103,16 @@ void redir_exec(t_cmd *cmd, char **envp)
         }
         k++;
     }
-    (void)envp;
-    printf("\n%s command %d\n", command, len_command);
-    path = ft_find_path(command, envp);
-    ft_execute_command(cmd, path, my_t_cmd, envp);
-    free(command);
-    free(path);
+    if (command)
+    {
+        path = ft_find_path(command, envp);
+        ft_execute_command(cmd, path, my_t_cmd, envp);
+        free(command);
+        free(path);
+    }
+    free_token_list(cmd);
+    ft_free(cmd->args);
+    ft_free(my_t_cmd);
     exit(0);
 }
 /*ls -a << e > a.txt << b*/

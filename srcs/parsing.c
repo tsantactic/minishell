@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:36:25 by tambinin          #+#    #+#             */
-/*   Updated: 2024/11/14 17:17:17 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/18 15:39:02 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,15 +138,7 @@ int	parse_cmd(char *line, t_cmd *cmd, char **env)
 		}
 		else
 		{
-			j = 0;
-			while (j < cmd->len_arg)
-			{
-				free(cmd->token_arg[j]);
-				j++;
-			}
-			free(cmd->token_arg);
-			cmd->token_arg = NULL;
-			free_tokens(cmd);
+			free_token_list(cmd);
 			j = 0;
 			while (cmd->args[j] != NULL)
 				free(cmd->args[j++]);
