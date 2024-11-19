@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 13:44:18 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/19 11:48:45 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/19 12:01:03 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,19 @@
 /*et */
 /*d'utiliser char **args dans le structure de cmd : cmd->args*/
 /*ls -a << e > a*/
+int count_heredoc_arg(t_cmd *cmd, int count_heredoc)
+{
+    int i;
+
+    i = 0;
+    while (i < cmd->len_tokens)
+    {
+        if (cmd->tokens[i]->type == REDIR_HEREDOC)
+            count_heredoc++;
+        i++;
+    }
+    return (count_heredoc);
+}
 void redir_exec(t_cmd *cmd, char **envp)
 {
     int i = 0;
@@ -25,14 +38,7 @@ void redir_exec(t_cmd *cmd, char **envp)
     i = 0;
     int **pipe_heredoc;
     int count_heredoc = 0;
-    i = 0;
-    while (i < cmd->len_tokens)
-    {
-        if (cmd->tokens[i]->type == REDIR_HEREDOC)
-            count_heredoc++;
-        i++;
-    }
-
+    count_heredoc = count_heredoc_arg(cmd, count_heredoc);
     pipe_heredoc = malloc(sizeof(int *) * count_heredoc);
     i = 0;
     while (i < count_heredoc)
