@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 16:41:01 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/14 16:23:24 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/19 10:20:49 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,14 @@ typedef struct s_cmd
 {
 	t_token **tokens;
 	t_token ***commands_arg;
-	int len_tokens;
+	t_token_type type;
 	char	*cmd;
-	char	**args;
 	char	**token_arg;
+	char	**args;
+	int 	len_tokens;
 	int		len_arg;
 	char	*input_file;
 	int		output_file;
-	char	*heredoc_file;
 	char	*env_value;
 	int		append_output;
 	int		has_pipe;
@@ -92,7 +92,6 @@ typedef struct s_cmd
 	int heredoc;
 	int index;
 	int is_empty;
-	t_token_type type;
 	int index_command;
 }			t_cmd;
 

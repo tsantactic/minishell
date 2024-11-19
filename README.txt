@@ -75,97 +75,102 @@ cat Makefile | grep -i name |
 
 void redir_exec(t_cmd *cmd, char **envp)
 {
-    int i = 0;
-    char **my_t_cmd = NULL;
-    int len_command = 0;
-    char *path = NULL;
-    char *command = NULL;
-    int count_herdoc = 0;
-    i = 0;
-    while (i < cmd->len_tokens)
-    {
+    int count_heredoc = 0;
+    int **pipe_heredoc;
+    // Comptage des heredocs
+    for (int i = 0; i < cmd->len_tokens; i++)
         if (cmd->tokens[i]->type == REDIR_HEREDOC)
-            count_herdoc++;
-        i++;
-    }
-    int heredoc_file_fd = open("filemy.tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
-    i = 0;
-    while (i < cmd->len_tokens)
-    {  
-        if (cmd->tokens[i]->type == CMD || cmd->tokens[i]->type == ARG)
-            len_command++;
+            count_heredoc++;
 
+    // Allocation des pipes heredocs
+    pipe_heredoc = malloc(sizeof(int *) * count_heredoc);
+    for (int i = 0; i < count_heredoc; i++)
+        pipe_heredoc[i] = malloc(sizeof(int) * 2);
+
+    int heredoc_index = 0;
+    for (int i = 0; i < cmd->len_tokens; i++)
+    {
         if (cmd->tokens[i]->type == REDIR_HEREDOC)
         {
             char *delimiter = cmd->tokens[i + 1]->value;
-            loop_heredoc(delimiter, heredoc_file_fd);
-            i += 1;
+            pipe(pipe_heredoc[heredoc_index]);
+            loop_heredoc(delimiter, pipe_heredoc[heredoc_index]);
+            heredoc_index++;
         }
-        i++;
     }
-    
-    my_t_cmd = malloc(sizeof(char *) * (len_command + 1));
-    if (!my_t_cmd)
+
+    // Connecter le dernier heredoc à stdin
+    if (count_heredoc > 0)
     {
-        perror("malloc");
-        exit(EXIT_FAILURE);
+        dup2(pipe_heredoc[count_heredoc - 1][0], STDIN_FILENO);
+        close(pipe_heredoc[count_heredoc - 1][0]);
+        close(pipe_heredoc[count_heredoc - 1][1]);
     }
-    command = copy_command_arg(cmd, my_t_cmd, command);
-    int k = 0;
-    while (k < cmd->len_tokens)
-    {
-        if (cmd->tokens[k]->type == REDIR_OUT)
-        {
-            int fd = open(cmd->tokens[k + 1]->value, O_WRONLY | O_CREAT | O_TRUNC, 0777);
-            if (fd < 0)
-            {
-                perror(cmd->tokens[k + 1]->value);
-                exit(EXIT_FAILURE);
-            }
-            dup2(fd, 1);
-            close(fd);
-            k++;
-        }
-        if (cmd->tokens[k]->type == REDIR_IN)
-        {
-            int fd = open(cmd->tokens[k + 1]->value, O_RDONLY);
-            if (fd < 0)
-            {
-                perror(cmd->tokens[k + 1]->value);
-                exit(EXIT_FAILURE);
-            }
-            dup2(fd, 0);
-            close(fd);
-            k++;
-        }
-        if (cmd->tokens[k]->type == REDIR_OUTPUT_APPEND)
-        {
-            int fd = open(cmd->tokens[k + 1]->value, O_WRONLY | O_APPEND | O_CREAT, 0777);
-            if (fd < 0)
-            {
-                perror(cmd->tokens[k + 1]->value);
-                exit(EXIT_FAILURE);
-            }
-            dup2(fd, 1);
-            close(fd);
-            k++;
-        }
-        k++;
-    }
-    dup2(heredoc_file_fd, 0);
-    close(heredoc_file_fd);
+
+    // Gestion des commandes et exécution
+    char *command = copy_command_arg(cmd, NULL, NULL);
     if (command)
     {
-        path = ft_find_path(command, envp);
-        ft_execute_command(cmd, path, my_t_cmd, envp);
-        free(command);
+        char *path = ft_find_path(command, envp);
+        ft_execute_command(cmd, path, NULL, envp);
         free(path);
     }
-    free_token_list(cmd);
-    ft_free(cmd->args);
-    ft_free(my_t_cmd);
-    unlink("filemy.tmp");
-    exit(0);
-}
 
+    // Libération
+    for (int i = 0; i < count_heredoc; i++)
+        free(pipe_heredoc[i]);
+    free(pipe_heredoc);
+}
+void handle_heredocs(t_cmd *cmd)
+{
+    int count_heredoc = 0;
+    int **pipe_heredoc;
+
+    // Compter le nombre de heredocs
+    for (int i = 0; i < cmd->len_tokens; i++)
+        if (cmd->tokens[i]->type == REDIR_HEREDOC)
+            count_heredoc++;
+
+    // Allouer les pipes pour chaque heredoc
+    pipe_heredoc = malloc(sizeof(int *) * count_heredoc);
+    for (int i = 0; i < count_heredoc; i++)
+        pipe_heredoc[i] = malloc(sizeof(int) * 2);
+
+    // Traiter chaque heredoc
+    int heredoc_index = 0;
+    for (int i = 0; i < cmd->len_tokens; i++)
+    {
+        if (cmd->tokens[i]->type == REDIR_HEREDOC)
+        {
+            char *delimiter = cmd->tokens[i + 1]->value;
+            pipe(pipe_heredoc[heredoc_index]); // Créer un pipe pour le heredoc
+            loop_heredoc(delimiter, pipe_heredoc[heredoc_index]); // Remplir le pipe
+            heredoc_index++;
+        }
+    }
+
+    // Créer un pipe final pour fusionner les contenus
+    int final_pipe[2];
+    pipe(final_pipe);
+
+    // Fusionner tous les pipes heredoc dans le pipe final
+    for (int i = 0; i < count_heredoc; i++)
+    {
+        char buffer[1024];
+        ssize_t bytes_read;
+
+        close(pipe_heredoc[i][1]); // Fermer l'écriture dans le pipe heredoc
+        while ((bytes_read = read(pipe_heredoc[i][0], buffer, sizeof(buffer))) > 0)
+            write(final_pipe[1], buffer, bytes_read); // Copier dans le pipe final
+        close(pipe_heredoc[i][0]); // Fermer la lecture après fusion
+        free(pipe_heredoc[i]);
+    }
+
+    free(pipe_heredoc);
+
+    // Fermer l'écriture dans le pipe final et connecter à STDIN
+    close(final_pipe[1]);
+    dup2(final_pipe[0], STDIN_FILENO);
+    close(final_pipe[0]);
+}
 

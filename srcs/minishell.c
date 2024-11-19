@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 16:40:52 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/12 14:47:58 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/19 10:29:50 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,8 @@ int	main(int arg, char **argv, char **env)
 	memset(cmd.args, 0, sizeof(char *) * INITIAL_ARG_SIZE);
 	while (1)
 	{
-		input = readline("Minishell \001▸");
+		// input = readline("Minishell \001▸\002");
+		input = readline("Minishell: ");
 		if (input == NULL)
 		{
 			printf("exit\n");

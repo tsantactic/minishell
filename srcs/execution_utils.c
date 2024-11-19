@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 14:44:02 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/18 14:20:02 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/19 11:11:44 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ char	*ft_find_path(char *t_cmd, char **envp)
 		free(path_t_cmd);
 		j++;
 	}
+	free(t_cmd);
 	ft_free(path);
 	return (NULL);
 }

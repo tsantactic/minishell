@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 13:44:18 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/18 18:50:20 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/19 11:48:45 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,18 +25,23 @@ void redir_exec(t_cmd *cmd, char **envp)
     i = 0;
     int **pipe_heredoc;
     int count_heredoc = 0;
-    for (int i = 0; i < cmd->len_tokens; i++)
+    i = 0;
+    while (i < cmd->len_tokens)
+    {
         if (cmd->tokens[i]->type == REDIR_HEREDOC)
             count_heredoc++;
+        i++;
+    }
 
     pipe_heredoc = malloc(sizeof(int *) * count_heredoc);
-    for (int i = 0; i < count_heredoc; i++)
-        pipe_heredoc[i] = malloc(sizeof(int) * 2);
+    i = 0;
+    while (i < count_heredoc)
+        pipe_heredoc[i++] = malloc(sizeof(int) * 2);
 
     int heredoc_index = 0;
-
+    i = 0;
     while (i < cmd->len_tokens)
-    {  
+    {
         if (cmd->tokens[i]->type == CMD || cmd->tokens[i]->type == ARG)
             len_command++;
         if (cmd->tokens[i]->type == REDIR_HEREDOC)
@@ -44,16 +49,18 @@ void redir_exec(t_cmd *cmd, char **envp)
             char *delimiter = cmd->tokens[i + 1]->value;
             pipe(pipe_heredoc[heredoc_index]);
             loop_heredoc(delimiter, pipe_heredoc[heredoc_index]);
+            if (heredoc_index + 1 == count_heredoc)
+            {
+                dup2(pipe_heredoc[heredoc_index][0], STDIN_FILENO);
+                close(pipe_heredoc[heredoc_index][0]);
+                close(pipe_heredoc[heredoc_index][1]);
+            }
+            else
+                close(pipe_heredoc[heredoc_index][0]);
             heredoc_index++;
             i += 1;
         }
         i++;
-    }
-    if (count_heredoc > 0)
-    {
-        dup2(pipe_heredoc[count_heredoc - 1][0], STDIN_FILENO);
-        close(pipe_heredoc[count_heredoc - 1][0]);
-        close(pipe_heredoc[count_heredoc - 1][1]);
     }
     my_t_cmd = malloc(sizeof(char *) * (len_command + 1));
     if (!my_t_cmd)
@@ -105,14 +112,36 @@ void redir_exec(t_cmd *cmd, char **envp)
     }
     if (command)
     {
-        path = ft_find_path(command, envp);
-        ft_execute_command(cmd, path, my_t_cmd, envp);
-        free(command);
-        free(path);
+         i = 0;
+        while (i < count_heredoc)
+        {
+            free(pipe_heredoc[i]);
+            i++;
+        }
+        free(pipe_heredoc);
+        if (is_builtin(command) == 0)
+        {
+            path = ft_find_path(command, envp);
+            ft_execute_command(cmd, path, my_t_cmd, envp);
+            free(command);
+            free(path);
+        }
+        else
+        {
+            printf("%s is builtins\n", command);
+            free(command);
+        }
     }
     free_token_list(cmd);
     ft_free(cmd->args);
     ft_free(my_t_cmd);
+    i = 0;
+    while (i < count_heredoc)
+    {
+        free(pipe_heredoc[i]);
+        i++;
+    }
+    free(pipe_heredoc);
     exit(0);
 }
 /*ls -a << e > a.txt << b*/

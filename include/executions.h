@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 14:34:15 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/18 18:40:36 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/19 10:40:09 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,4 +26,5 @@ void     execute_with_pipes(t_cmd *cmd, char *env[]);
 void    redir_exec(t_cmd *cmd, char **envp);
 void loop_heredoc(char *delimiter, int *pipefd);
 char *copy_command_arg(t_cmd *cmd, char **my_t_cmd, char *command);
+int is_builtin(char *command);
 #endif
