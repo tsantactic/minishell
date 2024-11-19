@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 13:44:18 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/19 12:01:03 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/19 12:12:57 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,38 @@ int count_heredoc_arg(t_cmd *cmd, int count_heredoc)
     }
     return (count_heredoc);
 }
+
+void execute_heredoc(t_cmd *cmd, int **pipe_heredoc, int *len_command, int count_heredoc)
+{
+    int heredoc_index = 0;
+    int i;
+    char *delimiter;
+
+    delimiter = NULL;
+    i = 0;
+    while (i < cmd->len_tokens)
+    {
+        if (cmd->tokens[i]->type == CMD || cmd->tokens[i]->type == ARG)
+            (*len_command)++;
+        if (cmd->tokens[i]->type == REDIR_HEREDOC)
+        {
+            delimiter = cmd->tokens[i + 1]->value;
+            pipe(pipe_heredoc[heredoc_index]);
+            loop_heredoc(delimiter, pipe_heredoc[heredoc_index]);
+            if (heredoc_index + 1 == count_heredoc)
+            {
+                dup2(pipe_heredoc[heredoc_index][0], STDIN_FILENO);
+                close(pipe_heredoc[heredoc_index][0]);
+                close(pipe_heredoc[heredoc_index][1]);
+            }
+            else
+                close(pipe_heredoc[heredoc_index][0]);
+            heredoc_index++;
+            i += 1;
+        }
+        i++;
+    }
+}
 void redir_exec(t_cmd *cmd, char **envp)
 {
     int i = 0;
@@ -44,30 +76,8 @@ void redir_exec(t_cmd *cmd, char **envp)
     while (i < count_heredoc)
         pipe_heredoc[i++] = malloc(sizeof(int) * 2);
 
-    int heredoc_index = 0;
-    i = 0;
-    while (i < cmd->len_tokens)
-    {
-        if (cmd->tokens[i]->type == CMD || cmd->tokens[i]->type == ARG)
-            len_command++;
-        if (cmd->tokens[i]->type == REDIR_HEREDOC)
-        {
-            char *delimiter = cmd->tokens[i + 1]->value;
-            pipe(pipe_heredoc[heredoc_index]);
-            loop_heredoc(delimiter, pipe_heredoc[heredoc_index]);
-            if (heredoc_index + 1 == count_heredoc)
-            {
-                dup2(pipe_heredoc[heredoc_index][0], STDIN_FILENO);
-                close(pipe_heredoc[heredoc_index][0]);
-                close(pipe_heredoc[heredoc_index][1]);
-            }
-            else
-                close(pipe_heredoc[heredoc_index][0]);
-            heredoc_index++;
-            i += 1;
-        }
-        i++;
-    }
+    execute_heredoc(cmd, pipe_heredoc, &len_command, count_heredoc);
+    
     my_t_cmd = malloc(sizeof(char *) * (len_command + 1));
     if (!my_t_cmd)
     {
