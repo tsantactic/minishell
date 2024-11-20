@@ -14,7 +14,7 @@
 # define EXECUTIONS_H
 
 typedef struct s_cmd t_cmd;
-
+const char	*get_env_value(const char *var, char **env);
 void	execute_all(t_cmd *cmd, char *envp[]);
 char	*ft_is_path(char **envp);
 void	ft_perror(char *msg);

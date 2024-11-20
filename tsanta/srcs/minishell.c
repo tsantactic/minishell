@@ -48,8 +48,7 @@ int	main(int arg, char **argv, char **env)
 	memset(cmd.args, 0, sizeof(char *) * INITIAL_ARG_SIZE);
 	while (1)
 	{
-		// input = readline("Minishell \001▸\002");
-		input = readline("Minishell: ");
+		input = readline("$tambinin&&sandriam@minishell%> ");
 		if (input == NULL)
 		{
 			printf("exit\n");

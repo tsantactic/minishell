@@ -131,7 +131,7 @@ int	parse_cmd(char *line, t_cmd *cmd, char **env)
 			count_pipe(cmd);
 			// printf("\nnous avons %ld pipe\n", cmd->nb_pipe);
 			if (cmd->nb_pipe == 0 && cmd->len_arg > 0) /*tsisy pipe*/
-				fork_exec(cmd, env);
+				execute_all(cmd, env);
 			else if (cmd->nb_pipe > 0 && cmd->len_arg > 0) /*misy pipe*/
 				execute_with_pipes(cmd, env);
 			return (0);

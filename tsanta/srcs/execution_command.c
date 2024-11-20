@@ -217,37 +217,50 @@ void execute_all(t_cmd *cmd, char *envp[])
         i++;
     }
     my_t_cmd[j] = NULL;
-    if (contains_redirection(my_t_cmd, len))
+    if (command && is_builtin(command))
     {
-        for (int k = 0; k < j; k++)
-            free(my_t_cmd[k]);
-        free(my_t_cmd);
         redir_exec(cmd, envp);
+        return ;
     }
-    if (command && !is_builtin(command) && !contains_bin(command) && !contains_redirection(my_t_cmd, len))
+    else 
     {
-        path = ft_find_path(command, envp);
-        ft_execute_command(cmd, path, my_t_cmd, envp);
-        exit(0);
-    }
-    else if (command && is_builtin(command) && !contains_bin(command) && !contains_redirection(my_t_cmd, len))
-    {
-        /*utiliser cmd->len_tokens, cmd->tokens[i]->value, cmd->tokens[i]->type*/
-        printf("%d\n", cmd->len_tokens);
-        printf("%s type :%d\n",cmd->tokens[0]->value,cmd->tokens[0]->type);
-        write(2,"\n*is builtins*\n",15);
-    }
-    else if (command && contains_bin(command) && !contains_redirection(my_t_cmd, len))
-    {
-        write(2,"\n*is chemin absolute*\n",22);
-        command = extract_command_bin(command);
-        path = ft_find_path(command, envp);
-        free(command);
-        ft_execute_command(cmd, path, my_t_cmd, envp);
-        exit(1);
-    }
-    free_token_list(cmd);
-    ft_free(cmd->args);
-    free_tokens(cmd);
-    ft_free(my_t_cmd);
+        pid_t pid;
+
+        pid = fork();
+        if (pid == -1)
+            ft_perror("fork");
+        if (pid == 0)
+        {
+            if (contains_redirection(my_t_cmd, len))
+            {
+                for (int k = 0; k < j; k++)
+                    free(my_t_cmd[k]);
+                free(my_t_cmd);
+                redir_exec(cmd, envp);
+                return ;
+            }
+            else if (command && !is_builtin(command) && !contains_bin(command) && !contains_redirection(my_t_cmd, len))
+            {
+                path = ft_find_path(command, envp);
+                ft_execute_command(cmd, path, my_t_cmd, envp);
+                exit(0);
+            }
+            else if (command && contains_bin(command) && !contains_redirection(my_t_cmd, len))
+            {
+                write(2,"\n*is chemin absolute*\n",22);
+                command = extract_command_bin(command);
+                path = ft_find_path(command, envp);
+                free(command);
+                ft_execute_command(cmd, path, my_t_cmd, envp);
+                exit(1);
+            }
+        }
+        else
+        {
+            if (waitpid(pid, NULL, 0) == -1)
+                ft_perror("waitpid");
+            free_token_list(cmd);
+        }
+   }
+   ft_free(my_t_cmd);
 }

@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 13:44:18 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/19 12:12:57 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/19 14:59:19 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int count_heredoc_arg(t_cmd *cmd, int count_heredoc)
     return (count_heredoc);
 }
 
-void execute_heredoc(t_cmd *cmd, int **pipe_heredoc, int *len_command, int count_heredoc)
+void execute_heredoc(t_cmd *cmd, int **pipe_heredoc, int *len_command, int count_heredoc, int *herdoc_fd)
 {
     int heredoc_index = 0;
     int i;
@@ -48,8 +48,7 @@ void execute_heredoc(t_cmd *cmd, int **pipe_heredoc, int *len_command, int count
             loop_heredoc(delimiter, pipe_heredoc[heredoc_index]);
             if (heredoc_index + 1 == count_heredoc)
             {
-                dup2(pipe_heredoc[heredoc_index][0], STDIN_FILENO);
-                close(pipe_heredoc[heredoc_index][0]);
+                *herdoc_fd = pipe_heredoc[heredoc_index][0];
                 close(pipe_heredoc[heredoc_index][1]);
             }
             else
@@ -70,14 +69,14 @@ void redir_exec(t_cmd *cmd, char **envp)
     i = 0;
     int **pipe_heredoc;
     int count_heredoc = 0;
+    int heredoc_fd = -1;
     count_heredoc = count_heredoc_arg(cmd, count_heredoc);
     pipe_heredoc = malloc(sizeof(int *) * count_heredoc);
     i = 0;
     while (i < count_heredoc)
         pipe_heredoc[i++] = malloc(sizeof(int) * 2);
 
-    execute_heredoc(cmd, pipe_heredoc, &len_command, count_heredoc);
-    
+    execute_heredoc(cmd, pipe_heredoc, &len_command, count_heredoc, &heredoc_fd);
     my_t_cmd = malloc(sizeof(char *) * (len_command + 1));
     if (!my_t_cmd)
     {
@@ -86,6 +85,11 @@ void redir_exec(t_cmd *cmd, char **envp)
     }
     command = copy_command_arg(cmd, my_t_cmd, command);
     int k = 0;
+    if (heredoc_fd != -1 && ft_strcmp(command, "cd") != 0)
+    {
+        dup2(heredoc_fd, STDIN_FILENO);
+        close(heredoc_fd);
+    }
     while (k < cmd->len_tokens)
     {
         if (cmd->tokens[k]->type == REDIR_OUT)
@@ -94,6 +98,16 @@ void redir_exec(t_cmd *cmd, char **envp)
             if (fd < 0)
             {
                 perror(cmd->tokens[k + 1]->value);
+                free_token_list(cmd);
+                ft_free(cmd->args);
+                ft_free(my_t_cmd);
+                i = 0;
+                while (i < count_heredoc)
+                {
+                    free(pipe_heredoc[i]);
+                    i++;
+                }
+                free(pipe_heredoc);
                 exit(EXIT_FAILURE);
             }
             dup2(fd, 1);
@@ -106,6 +120,17 @@ void redir_exec(t_cmd *cmd, char **envp)
             if (fd < 0)
             {
                 perror(cmd->tokens[k + 1]->value);
+                free_token_list(cmd);
+                ft_free(cmd->args);
+                ft_free(my_t_cmd);
+                i = 0;
+                while (i < count_heredoc)
+                {
+                    free(pipe_heredoc[i]);
+                    i++;
+                }
+                free(pipe_heredoc);
+                free(command);
                 exit(EXIT_FAILURE);
             }
             dup2(fd, 0);
@@ -118,6 +143,16 @@ void redir_exec(t_cmd *cmd, char **envp)
             if (fd < 0)
             {
                 perror(cmd->tokens[k + 1]->value);
+                free_token_list(cmd);
+                ft_free(cmd->args);
+                ft_free(my_t_cmd);
+                i = 0;
+                while (i < count_heredoc)
+                {
+                    free(pipe_heredoc[i]);
+                    i++;
+                }
+                free(pipe_heredoc);
                 exit(EXIT_FAILURE);
             }
             dup2(fd, 1);
@@ -128,7 +163,7 @@ void redir_exec(t_cmd *cmd, char **envp)
     }
     if (command)
     {
-         i = 0;
+        i = 0;
         while (i < count_heredoc)
         {
             free(pipe_heredoc[i]);
@@ -144,8 +179,23 @@ void redir_exec(t_cmd *cmd, char **envp)
         }
         else
         {
-            printf("%s is builtins\n", command);
-            free(command);
+            if (ft_strcmp(command, "cd") == 0)
+            {
+                if (my_t_cmd[1] != NULL)
+                {
+                    if (chdir(my_t_cmd[1]) == -1)
+                    {
+                        perror("cd");
+                    }
+                }
+                else
+                {
+                    ft_putendl_fd("without argument",2);
+                }
+            }
+            free_token_list(cmd);
+            ft_free(my_t_cmd);
+            return ;
         }
     }
     free_token_list(cmd);
@@ -158,8 +208,9 @@ void redir_exec(t_cmd *cmd, char **envp)
         i++;
     }
     free(pipe_heredoc);
-    exit(0);
+    return ;
 }
+
 /*ls -a << e > a.txt << b*/
 /*priorite heredoc, donc classer tous les hererdoc avec ses delimiter et axecuter tant un par un le readline*/
 /*recuperation de command de type 1 avec son argument de tous type 3 dans my_t_cmd*/

@@ -44,6 +44,11 @@ char	*build_path_t_cmd(char *path, char *t_cmd)
 	if (!part_path)
 		return (NULL);
 	path_t_cmd = ft_strjoin(part_path, t_cmd);
+	if (!path_t_cmd)
+	{
+		free(part_path);
+		return NULL;
+	}
 	free(part_path);
 	return (path_t_cmd);
 }
@@ -70,7 +75,8 @@ char	*ft_find_path(char *t_cmd, char **envp)
 			ft_free(path);
 			return (path_t_cmd);
 		}
-		free(path_t_cmd);
+		else if (!path_t_cmd)
+			free(path_t_cmd);
 		j++;
 	}
 	free(t_cmd);
@@ -134,7 +140,34 @@ void	ft_execute_command(t_cmd *cmd, char *path, char **my_t_cmd, char **envp)
 					ft_putstr_fd(":command not found\n", 2);
 				}
 				else
+				{
+					ft_free(my_t_cmd);
+					int	i;
+					i = 0;
+					while (i < cmd->len_tokens)
+					{
+						free(cmd->tokens[i]->value);
+						free(cmd->tokens[i]);
+						i++;
+					}
+					free(cmd->tokens);
+					int j = 0;
+					while (j < cmd->len_arg)
+					{
+						free(cmd->token_arg[j]);
+						j++;
+					}
+					free(cmd->token_arg);
+					cmd->token_arg = NULL;
+					j = 0;
+					while (cmd->args[j] != NULL)
+					{
+						free(cmd->args[j++]);
+					}
+					free(cmd->args);
 					ft_putstr_fd(": Is a directory\n", 2);
+					exit(1);
+				}
 			}
 		}
 		else
@@ -161,28 +194,63 @@ void	ft_execute_command(t_cmd *cmd, char *path, char **my_t_cmd, char **envp)
 				ft_putstr_fd("minishell: ", 2);
 				ft_putstr_fd(my_t_cmd[0], 2);
 				if (is_not_cmd)
+				{
+					int	i;
+					i = 0;
+					while (i < cmd->len_tokens)
+					{
+						//free(cmd->tokens[i]->value);
+						free(cmd->tokens[i]);
+						i++;
+					}
+					free(cmd->tokens);
 					ft_putstr_fd(": No such file or directory\n", 2);
+				}
 				else
+				{
+					int	i;
+					i = 0;
+					while (i < cmd->len_tokens)
+					{
+						free(cmd->tokens[i]);
+						i++;
+					}
+					free(cmd->tokens);
 					ft_putstr_fd(": command not found\n", 2);
+				}
 			}
 		}
 		ft_free(my_t_cmd);
-		free(path);
-		free_tokens_and_args(cmd);
+		int j = 0;
+		while (j < cmd->len_arg)
+		{
+			free(cmd->token_arg[j]);
+			j++;
+		}
+		free(cmd->token_arg);
+		cmd->token_arg = NULL;
+		j = 0;
+		while (cmd->args[j] != NULL)
+		{
+			free(cmd->args[j++]);
+		}
+		free(cmd->args);
 		exit(1);
 	}
 	else if (execve(path, my_t_cmd, envp) == -1)
 	{
 		struct stat path_stat;
+		ft_putstr_fd("minishell: '", 2);
+		ft_putstr_fd(my_t_cmd[0], 2);
 		if (stat(my_t_cmd[0], &path_stat) == 0)
 		{
 			if (S_ISDIR(path_stat.st_mode))
 			{
-				ft_putstr_fd("minishell: ", 2);
-				ft_putstr_fd(my_t_cmd[0], 2);
 				ft_putstr_fd(": Is a directory\n", 2);
 			}
 		}
+		else
+			ft_putstr_fd("': command not found\n", 2);
 		free_token_list(cmd);
 		ft_free(my_t_cmd);
 		free(path);
