@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lexing.c                                           :+:      :+:    :+:   */
+/*   tokenisation.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 14:53:33 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/12 16:53:31 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/23 10:37:08 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,6 @@ void	free_token_arg(t_cmd *cmd, int i)
 	cmd->token_arg = NULL;
 }
 
-/*function for separate per space and give argument with or without quote*/
 void	stock_token(t_cmd *cmd)
 {
 	int	i;

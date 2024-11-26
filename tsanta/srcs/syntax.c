@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 10:38:31 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/10 14:03:47 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/25 14:34:09 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,8 @@ int check_error_arg(t_token **tokens, int len_tokens)
         while (i < len_tokens)
         {
             if ((tokens[i]->type == REDIR_IN || tokens[i]->type == REDIR_OUT || tokens[i]->type == REDIR_OUTPUT_APPEND || tokens[i]->type == REDIR_HEREDOC) && i + 1 == len_tokens)
-            { 
-                ft_putendl_fd("minishell: syntax error near unexpected token `newline'",2);
-                return (-1);
+            {
+                return (-2);
             }
             if (tokens[i]->type == PIPE && i + 1 == len_tokens)
             { 
@@ -43,7 +42,7 @@ int check_error_arg(t_token **tokens, int len_tokens)
             }
             if (tokens[i]->type == REDIR_OUT && tokens[i + 1]->type == PIPE)
             {
-                ft_putendl_fd("minishell: syntax error near unexpected token `newline'",2);
+                ft_putendl_fd("minishell: syntax error near unexpected token `|'",2);
                 return (-1);
             }
             if ((tokens[i]->type == REDIR_OUTPUT_APPEND || tokens[i]->type == REDIR_HEREDOC || tokens[i]->type == REDIR_OUT || tokens[i]->type == REDIR_IN) && tokens[i + 1]->type == REDIR_OUTPUT_APPEND)
@@ -80,4 +79,50 @@ int check_error_arg(t_token **tokens, int len_tokens)
         }
     }
     return (1);
+}
+
+int set_index_syntax(t_token **tokens, int len_tokens)
+{
+    int i = 0;
+    while (i < len_tokens)
+    {
+        if ((tokens[i]->type == REDIR_IN || tokens[i]->type == REDIR_OUT || tokens[i]->type == REDIR_OUTPUT_APPEND || tokens[i]->type == REDIR_HEREDOC) && i + 1 == len_tokens)
+        {
+            return (i);
+        }
+        if (tokens[i]->type == PIPE && i + 1 == len_tokens)
+        { 
+            return (i);
+        }
+        if (tokens[i]->type == REDIR_OUT && tokens[i + 1]->type == PIPE)
+        {
+            return (i);
+        }
+        if ((tokens[i]->type == REDIR_OUTPUT_APPEND || tokens[i]->type == REDIR_HEREDOC || tokens[i]->type == REDIR_OUT || tokens[i]->type == REDIR_IN) && tokens[i + 1]->type == REDIR_OUTPUT_APPEND)
+        {
+            return (i);
+        }
+        if ((tokens[i]->type == REDIR_OUTPUT_APPEND || tokens[i]->type == REDIR_HEREDOC || tokens[i]->type == REDIR_OUT || tokens[i]->type == REDIR_IN) && tokens[i + 1]->type == REDIR_HEREDOC)
+        {
+            return (i);
+        }
+        if ((tokens[i]->type == REDIR_OUTPUT_APPEND || tokens[i]->type == REDIR_HEREDOC || tokens[i]->type == REDIR_IN) && tokens[i + 1]->type == PIPE)
+        {
+            return (i);
+        }
+        if ((tokens[i]->type == REDIR_OUTPUT_APPEND || tokens[i]->type == REDIR_HEREDOC || tokens[i]->type == REDIR_OUT || tokens[i]->type == REDIR_IN) && tokens[i + 1]->type == REDIR_OUT)
+        {
+            return (i);
+        }
+        if ((tokens[i]->type == REDIR_OUTPUT_APPEND || tokens[i]->type == REDIR_HEREDOC || tokens[i]->type == REDIR_OUT || tokens[i]->type == REDIR_IN) && tokens[i + 1]->type == REDIR_IN)
+        {
+            return (i);
+        }
+        if (tokens[i]->type == PIPE && tokens[i + 1]->type == PIPE)
+        {
+            return (i);
+        }
+        i++;
+    }
+    return (i);
 }

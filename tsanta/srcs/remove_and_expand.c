@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 17:59:52 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/14 13:49:02 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/26 11:56:11 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,13 @@ void	add_all(size_t *indices, char *result, const char *str, t_cmd *cmd,
 				continue ;
 			}
 			else
+			{
+				if (str[indices[0] + 1] == '?')
+				{
+					printf("state : %d\n", set_state(-1));
+				}
 				add_double_quote(str, indices, result, env, type);
+			}
 		}
 		else
 			result[indices[1]++] = str[indices[0]];

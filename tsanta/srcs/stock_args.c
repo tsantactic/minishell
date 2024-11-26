@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/20 12:04:16 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/12 17:12:04 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/23 10:37:12 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ t_cmd	*init_variable(t_cmd *cmd)
 	cmd->arg_index = 0;
 	return (cmd);
 }
-/*just stock argument separate with space*/
 void	stock_arg(char *s, t_cmd *cmd)
 {
 	int		i;

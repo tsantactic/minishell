@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 16:41:01 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/19 10:20:49 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/26 11:56:13 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 # include <unistd.h>
 # include "tokens.h"
 # include "executions.h"
+
 # define INITIAL_ARG_SIZE 100
 
 typedef enum e_token_type
@@ -69,13 +70,6 @@ typedef struct s_cmd
 	char	**args;
 	int 	len_tokens;
 	int		len_arg;
-	char	*input_file;
-	int		output_file;
-	char	*env_value;
-	int		append_output;
-	int		has_pipe;
-	char	*pipe_cmd;
-	int		arg_count;
 
 	int		in_single_quote;
 	int		in_double_quote;
@@ -85,6 +79,7 @@ typedef struct s_cmd
 	int		start;
 	int		arg_index;
 	size_t nb_pipe;
+	int state;
 	int	is_cmd;
 	int infile;
 	int outfile;
@@ -93,18 +88,24 @@ typedef struct s_cmd
 	int index;
 	int is_empty;
 	int index_command;
+
 }			t_cmd;
 
 void		ft_free(char **str);
 char		*ft_strndup(const char *s, int n);
 char		*ft_strjoin_copy(char const *s1, char const *s2);
 
-int			parse_cmd(char *line, t_cmd *cmd, char **env);
+void loop_readline(t_cmd *cmd, char **env);
+int			lexing_arg(char *line, t_cmd *cmd, char **env);
 void		stock_token(t_cmd *cmd);
 int			count_arg(char *s, t_cmd *cmd);
 void		stock_arg(char *s, t_cmd *cmd);
 char 		*remove_quotes_and_expand(t_cmd *cmd, const char *str, char **env, t_token_type type);
-void free_tokens_and_args(t_cmd *cmd);
 
 int			check_error_arg(t_token **tokens, int len_tokens);
+int set_index_syntax(t_token **tokens, int len_tokens);
+
+void	sig_handler(int signum);
+void	sig_quit_handler(int signum);
+int set_state(int state);
 #endif

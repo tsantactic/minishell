@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:46:48 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/08 12:35:43 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/23 10:37:06 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,6 @@ void	init_flag(t_cmd *cmd)
 	cmd->outapp = 0;
 	cmd->heredoc = 0;
 }
-/*type argument look at structure on header please xd*/
 void	type_token(t_cmd *cmd)
 {
 	init_flag(cmd);

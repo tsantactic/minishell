@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_utils.c                                    :+:      :+:    :+:   */
+/*   lexing_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/19 16:45:11 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/14 17:39:17 by sandriam         ###   ########.fr       */
+/*   Created: 2024/11/23 09:21:49 by sandriam          #+#    #+#             */
+/*   Updated: 2024/11/23 09:27:41 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ int	count_word(char *s, int *i, int *len, t_cmd *cmd)
 	return (*len);
 }
 
-/*count how many argument we will have per command*/
 int	count_arg(char *s, t_cmd *cmd)
 {
 	int	i;

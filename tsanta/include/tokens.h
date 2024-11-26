@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:35:49 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/10 17:19:28 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/23 10:11:49 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 
 typedef struct s_cmd t_cmd;
 
-void type_token(t_cmd *cmd);
+void    type_token(t_cmd *cmd);
 void	free_tokens(t_cmd *cmd);
 void 	free_token_list(t_cmd *cmd);
+void    free_tokens_all(t_cmd *cmd);
+void 		free_tokens_and_args(t_cmd *cmd);
 
 #endif
