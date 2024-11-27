@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 11:00:30 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/26 11:56:06 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/27 16:26:29 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void execute_heredoc(t_cmd *cmd, int **pipe_heredoc, int count_heredoc)
     delimiter = NULL;
     i = 0;
     while (i < cmd->len_tokens)
-    {   
+    {
         if (cmd->tokens[i]->type == REDIR_HEREDOC)
         {
             if (cmd->tokens[i + 1]->type == DELIMITER)
@@ -61,7 +61,15 @@ void execute_heredoc(t_cmd *cmd, int **pipe_heredoc, int count_heredoc)
                 delimiter = cmd->tokens[i + 1]->value;
                 pipe(pipe_heredoc[heredoc_index]);
                 loop_heredoc(delimiter, pipe_heredoc[heredoc_index]);
-                if (heredoc_index + 1 == count_heredoc)
+                int k = i + 1;
+                int is_last_stdin = 0;
+                while (k < cmd->len_tokens)
+                {
+                    if (cmd->tokens[k]->type == REDIR_HEREDOC || cmd->tokens[k]->type == REDIR_IN)
+                        is_last_stdin = 1;
+                    k++;
+                }
+                if (heredoc_index + 1 == count_heredoc && is_last_stdin == 0)
                 {
                     dup2(pipe_heredoc[heredoc_index][0], STDIN_FILENO);
                     close(pipe_heredoc[heredoc_index][1]);
@@ -102,7 +110,21 @@ int contains_heredoc(t_cmd *cmd)
     }
     return (0);
 }
+void parse_exec_heredoc(t_cmd *cmd)
+{
+    cmd->pipe_heredoc = NULL;
+    cmd->count_heredoc = 0;
 
+    if (contains_heredoc(cmd))
+    {
+        cmd->count_heredoc = count_heredoc_arg(cmd, cmd->count_heredoc);
+        cmd->pipe_heredoc = malloc(sizeof(int *) * cmd->count_heredoc);
+        int i = 0;
+        while (i < cmd->count_heredoc)
+            cmd->pipe_heredoc[i++] = malloc(sizeof(int) * 2);
+        execute_heredoc(cmd, cmd->pipe_heredoc, cmd->count_heredoc);
+    }
+}
 /****command****/
 void count_command_arg(t_cmd *cmd, int *len_command)
 {
@@ -132,7 +154,6 @@ char  *copy_command_arg(t_cmd *cmd, char **my_t_cmd, char *command)
     my_t_cmd[j] = NULL;
     return(command);
 }
-
 int redirection_exec(t_cmd *cmd)
 {
     int k = 0;
@@ -143,8 +164,7 @@ int redirection_exec(t_cmd *cmd)
             int fd = open(cmd->tokens[k + 1]->value, O_WRONLY | O_CREAT | O_TRUNC, 0777);
             if (fd < 0)
             {
-                cmd->state = 1;
-				set_state(cmd->state);
+				set_st(1);
                 perror(cmd->tokens[k + 1]->value);
                 return (1);
             }
@@ -157,12 +177,20 @@ int redirection_exec(t_cmd *cmd)
             int fd = open(cmd->tokens[k + 1]->value, O_RDONLY);
             if (fd < 0)
             {
-                cmd->state = 1;
-				set_state(cmd->state);
+				set_st(1);
                 perror(cmd->tokens[k + 1]->value);                
                 return (2);
             }
-            dup2(fd, 0);
+            int i = k + 1;
+            int is_last_stdin = 0;
+            while (i < cmd->len_tokens)
+            {
+                if (cmd->tokens[i]->type == REDIR_HEREDOC || cmd->tokens[i]->type == REDIR_IN)
+                    is_last_stdin = 1;
+                i++;
+            }
+            if (is_last_stdin == 0)
+                dup2(fd, 0);
             close(fd);
             k++;
         }
@@ -171,8 +199,7 @@ int redirection_exec(t_cmd *cmd)
             int fd = open(cmd->tokens[k + 1]->value, O_WRONLY | O_APPEND | O_CREAT, 0777);
             if (fd < 0)
             {
-                cmd->state = 1;
-				set_state(cmd->state);
+				set_st(1);
                 perror(cmd->tokens[k + 1]->value);
                 return (1);
             }
@@ -183,6 +210,21 @@ int redirection_exec(t_cmd *cmd)
         k++;
     }
     return (0);
+}
+
+void parse_exec_redirection(t_cmd *cmd)
+{
+    if (contains_redirection(cmd))
+    {
+        if (redirection_exec(cmd) == 2)
+        {
+            if (contains_heredoc(cmd))
+                free_pipe_heredoc(cmd->count_heredoc, cmd->pipe_heredoc);
+            ft_free_token_cmd(cmd);
+            free_tokens(cmd);
+            exit (1);
+        }
+    }
 }
 int contains_bin(const char *command)
 {
@@ -207,53 +249,123 @@ char *extract_command_bin(const char *command)
     }
     return ft_strdup(command);
 }
+void parse_exec_all(t_cmd *cmd)
+{
+    int count_command = 0;
+    int i = 0;
+    while ( i < cmd->len_tokens)
+    {
+        if (cmd->tokens[i]->type == CMD)
+            count_command++;
+        if (cmd->tokens[i]->type == REDIR_IN)
+            count_command++;
+        if (cmd->tokens[i]->type == REDIR_OUT)
+            count_command++;
+        if (cmd->tokens[i]->type == REDIR_OUTPUT_APPEND)
+            count_command++;
+        if (cmd->tokens[i]->type == REDIR_HEREDOC)
+            count_command++;
+        i++;
+    }
+    cmd->commands_arg = malloc(sizeof(t_token **) * (count_command + 1));
+    int j = 0;
+    int k = 0;
+    i = 0;
+    while (i < cmd->len_tokens)
+    {
+        if (cmd->tokens[i]->type == CMD)
+        {
+            k = 0;
+            cmd->commands_arg[j] = malloc(sizeof(t_token *) * (cmd->len_tokens + 1));
+            cmd->commands_arg[j][k] = malloc(sizeof(t_token));
+            if (!cmd->commands_arg[j][k])
+                return;
 
+            cmd->commands_arg[j][k]->value = cmd->tokens[i]->value;
+            cmd->commands_arg[j][k]->type = cmd->tokens[i]->type;
+            cmd->commands_arg[j][k] = NULL;
+            j++;
+        }
+        if (cmd->tokens[i]->type == REDIR_IN)
+        {
+            k = 0;
+            cmd->commands_arg[j] = malloc(sizeof(t_token *) * (cmd->len_tokens + 1));
+            cmd->commands_arg[j][k] = malloc(sizeof(t_token));
+            if (!cmd->commands_arg[j][k])
+                return;
+
+            cmd->commands_arg[j][k]->value = cmd->tokens[i]->value;
+            cmd->commands_arg[j][k]->type = cmd->tokens[i]->type;
+            cmd->commands_arg[j][k] = NULL;
+            j++;
+        }
+        if (cmd->tokens[i]->type == REDIR_OUT)
+        {
+            k = 0;
+            cmd->commands_arg[j] = malloc(sizeof(t_token *) * (cmd->len_tokens + 1));
+            cmd->commands_arg[j][k] = malloc(sizeof(t_token));
+            if (!cmd->commands_arg[j][k])
+                return;
+
+            cmd->commands_arg[j][k]->value = cmd->tokens[i]->value;
+            cmd->commands_arg[j][k]->type = cmd->tokens[i]->type;
+            cmd->commands_arg[j][k] = NULL;
+            j++;
+        }
+        if (cmd->tokens[i]->type == REDIR_OUTPUT_APPEND)
+        {
+            k = 0;
+            cmd->commands_arg[j] = malloc(sizeof(t_token *) * (cmd->len_tokens + 1));
+            cmd->commands_arg[j][k] = malloc(sizeof(t_token));
+            if (!cmd->commands_arg[j][k])
+                return;
+
+            cmd->commands_arg[j][k]->value = cmd->tokens[i]->value;
+            cmd->commands_arg[j][k]->type = cmd->tokens[i]->type;
+            cmd->commands_arg[j][k] = NULL;
+            j++;
+        }
+        if (cmd->tokens[i]->type == REDIR_HEREDOC)
+        {
+            k = 0;
+            cmd->commands_arg[j] = malloc(sizeof(t_token *) * (cmd->len_tokens + 1));
+            cmd->commands_arg[j][k] = malloc(sizeof(t_token));
+            if (!cmd->commands_arg[j][k])
+                return;
+
+            cmd->commands_arg[j][k]->value = cmd->tokens[i]->value;
+            cmd->commands_arg[j][k]->type = cmd->tokens[i]->type;
+            cmd->commands_arg[j][k] = NULL;
+            j++;
+        }
+        i++;
+    }
+
+    printf("\nnous avons %d a executer\n", count_command);
+    i = 0;
+    j = 0;
+
+    while (i < count_command)
+    {
+        j = 0;
+        printf("%d command: ", i);
+        while (cmd->commands_arg[i][j] && cmd->commands_arg[i][j]->value)
+        {
+            printf("%s (type %d)", cmd->commands_arg[i][j]->value,cmd->commands_arg[i][j]->type);
+            j++;
+        }
+        i++;
+    }
+    free_commands(cmd);
+    free(cmd->commands_arg);
+}
 void parsing_argument_simple(t_cmd *cmd, char **env)
 {
     /*parse redirection heredoc*/
-    int **pipe_heredoc;
-    int count_heredoc = 0;
-    if (contains_heredoc(cmd))
-    {
-        count_heredoc = count_heredoc_arg(cmd, count_heredoc);
-        pipe_heredoc = malloc(sizeof(int *) * count_heredoc);
-        int i = 0;
-        while (i < count_heredoc)
-            pipe_heredoc[i++] = malloc(sizeof(int) * 2);
-        execute_heredoc(cmd, pipe_heredoc, count_heredoc);
-    }
+    parse_exec_heredoc(cmd);
+    
     /*parse redirection in , out*/
-    if (contains_redirection(cmd))
-    {
-        if (redirection_exec(cmd) == 2)
-        {
-            if (contains_heredoc(cmd))
-            {
-                int i = 0;
-                while (i < count_heredoc)
-                    free(pipe_heredoc[i++]);
-                free(pipe_heredoc);
-            }
-            int	j;
-            j = 0;
-            while (j < cmd->len_arg)
-            {
-                free(cmd->token_arg[j]);
-                j++;
-            }
-            free(cmd->token_arg);
-            cmd->token_arg = NULL;
-            j = 0;
-            while (cmd->args[j])
-            {
-                free(cmd->args[j]);
-                j++;
-            }
-            free(cmd->args);
-            free_tokens(cmd);
-            exit (1);
-        }
-    }
+    parse_exec_redirection(cmd);
 
     /*parse command*/
     char **tmp_cmd = NULL;
@@ -305,20 +417,17 @@ void parsing_argument_simple(t_cmd *cmd, char **env)
                 if (is_not_cmd == 1 && !is_not_dir)
                 {
                     ft_putstr_fd("': filename argument required\n.: usage: . filename [arguments]\n", 2);
-                    cmd->state = 2;
-                    set_state(cmd->state);
+                    set_st(2);
                 }
                 else if (is_not_cmd == 2 && !is_not_dir)
                 {
                     ft_putstr_fd("':command not found\n", 2);
-                    cmd->state = 127;
-                    set_state(cmd->state);
+                    set_st(127);
                 }
                 else
                 {
                     ft_putstr_fd("': Is a directory\n", 2);
-                    cmd->state = 126;
-                    set_state(cmd->state);
+                    set_st(126);
                 }
             }
             else
@@ -326,8 +435,7 @@ void parsing_argument_simple(t_cmd *cmd, char **env)
                 if(errno == 20)
                 {
                     ft_putstr_fd("': Not a directory\n", 2);
-                    cmd->state = 126;
-                    set_state(cmd->state);
+                    set_st(126);
                 }
                 else if (errno == 2)
                 {
@@ -345,14 +453,12 @@ void parsing_argument_simple(t_cmd *cmd, char **env)
                     if (is_not_cmd)
                     {
                         ft_putstr_fd("': No such file or directory\n", 2);
-                        cmd->state = 127;
-                        set_state(cmd->state);
+                        set_st(127);
                     }
                     else
                     {
                         ft_putstr_fd("': command not found\n", 2);
-                        cmd->state = 127;
-                        set_state(cmd->state);
+                        set_st(127);
                     }
                 }
             }
@@ -360,43 +466,18 @@ void parsing_argument_simple(t_cmd *cmd, char **env)
         free(command);
         free(extracted_command);
         if (contains_heredoc(cmd))
-        {
-            int i = 0;
-            while (i < count_heredoc)
-            {
-                free(pipe_heredoc[i]);
-                i++;
-            }
-            free(pipe_heredoc);
-        }
+            free_pipe_heredoc(cmd->count_heredoc, cmd->pipe_heredoc);
     }
     else
     {
         if (contains_heredoc(cmd))
-        {
-            int i = 0;
-            while (i < count_heredoc)
-            {
-                free(pipe_heredoc[i]);
-                i++;
-            }
-            free(pipe_heredoc);
-        }
-
+            free_pipe_heredoc(cmd->count_heredoc, cmd->pipe_heredoc);
         free_tokens(cmd);
         if (tmp_cmd)
             ft_free(tmp_cmd);
         return;
     }
-    set_state(-1);
-    int i = 0;
-    while (i < cmd->len_tokens)
-    {
-        free(cmd->tokens[i]->value);
-        free(cmd->tokens[i]);
-        i++;
-    }
-    free(cmd->tokens);
+    free_tokens(cmd);
     if (tmp_cmd)
         ft_free(tmp_cmd);
     return ;

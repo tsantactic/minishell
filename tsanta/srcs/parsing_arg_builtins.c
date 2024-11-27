@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:26:57 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/26 11:56:05 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/27 15:47:20 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,42 +44,48 @@ void execute_heredoc_builtins(t_cmd *cmd, int **pipe_heredoc, int count_heredoc,
         i++;
     }
 }
-
-void parsing_arg_with_builtins(t_cmd *cmd, char **env)
+void exec_heredoc_builtins(t_cmd *cmd, int temp_pipe_heredoc)
 {
-    /*parse redirection heredoc*/
-    int **pipe_heredoc;
-    int count_heredoc = 0;
-    int temp_pipe_heredoc = -1;
-    int stdout_backup = dup(STDOUT_FILENO);
-    int stdin_backup = dup(STDIN_FILENO);
-
     if (contains_heredoc(cmd))
     {
-        count_heredoc = count_heredoc_arg(cmd, count_heredoc);
-        pipe_heredoc = malloc(sizeof(int *) * count_heredoc);
+        cmd->count_heredoc = count_heredoc_arg(cmd, cmd->count_heredoc);
+        cmd->pipe_heredoc = malloc(sizeof(int *) * cmd->count_heredoc);
         int i = 0;
-        while (i < count_heredoc)
-            pipe_heredoc[i++] = malloc(sizeof(int) * 2);
-        execute_heredoc_builtins(cmd, pipe_heredoc, count_heredoc, &temp_pipe_heredoc);
+        while (i < cmd->count_heredoc)
+            cmd->pipe_heredoc[i++] = malloc(sizeof(int) * 2);
+        execute_heredoc_builtins(cmd, cmd->pipe_heredoc, cmd->count_heredoc, &temp_pipe_heredoc);
     }
-    /*parse redirection in , out*/
-    if (contains_redirection(cmd))
+}
+int exec_redir_builtins(t_cmd *cmd)
+{
+   if (contains_redirection(cmd))
     {
         if (redirection_exec(cmd) == 2)
         {
             if (contains_heredoc(cmd))
-            {
-                int i = 0;
-                while (i < count_heredoc)
-                    free(pipe_heredoc[i++]);
-                free(pipe_heredoc);
-            }
-            close(stdout_backup);
-            close(stdin_backup);
-            return ;
+                free_pipe_heredoc(cmd->count_heredoc, cmd->pipe_heredoc);
+            dup2(cmd->stdout_backup, STDOUT_FILENO);
+            dup2(cmd->stdin_backup, STDIN_FILENO);
+            close(cmd->stdout_backup);
+            close(cmd->stdin_backup);
+            return (1);
         }
     }
+    return (0);
+}
+void parsing_arg_with_builtins(t_cmd *cmd, char **env)
+{
+    /*parse redirection heredoc*/
+    int temp_pipe_heredoc = -1;
+    cmd->pipe_heredoc = NULL;
+    cmd->count_heredoc = 0;
+    cmd->stdout_backup = dup(STDOUT_FILENO);
+    cmd->stdin_backup = dup(STDIN_FILENO);
+
+    exec_heredoc_builtins(cmd, temp_pipe_heredoc);
+    /*parse redirection in , out*/
+    if (exec_redir_builtins(cmd) == 1)
+        return ;
 
     /*parse command*/
     char **tmp_cmd = NULL;
@@ -90,15 +96,7 @@ void parsing_arg_with_builtins(t_cmd *cmd, char **env)
     if (tmp_cmd == NULL)
     {
         if (contains_heredoc(cmd))
-        {
-            int i = 0;
-            while (i < count_heredoc)
-            {
-                free(pipe_heredoc[i]);
-                i++;
-            }
-            free(pipe_heredoc);
-        }
+            free_pipe_heredoc(cmd->count_heredoc, cmd->pipe_heredoc);
         return;
     }
     command = copy_command_arg(cmd, tmp_cmd, command);
@@ -127,10 +125,10 @@ void parsing_arg_with_builtins(t_cmd *cmd, char **env)
                 else
                     perror("pwd");
             }
-            dup2(stdout_backup, STDOUT_FILENO);
-            dup2(stdin_backup, STDIN_FILENO);
-            close(stdout_backup);
-            close(stdin_backup);
+            dup2(cmd->stdout_backup, STDOUT_FILENO);
+            dup2(cmd->stdin_backup, STDIN_FILENO);
+            close(cmd->stdout_backup);
+            close(cmd->stdin_backup);
 
             printf("is buitins\n");
             free(command);
@@ -138,62 +136,27 @@ void parsing_arg_with_builtins(t_cmd *cmd, char **env)
             if (tmp_cmd)
                 ft_free(tmp_cmd);
             if (contains_heredoc(cmd))
-            {
-                int i = 0;
-                while (i < count_heredoc)
-                {
-                    free(pipe_heredoc[i]);
-                    i++;
-                }
-                free(pipe_heredoc);
-            }
-            cmd->state = 0;
+                free_pipe_heredoc(cmd->count_heredoc, cmd->pipe_heredoc);
             return ;
         }
         free(command);
         free(extracted_command);
         if (contains_heredoc(cmd))
-        {
-            int i = 0;
-            while (i < count_heredoc)
-            {
-                free(pipe_heredoc[i]);
-                i++;
-            }
-            free(pipe_heredoc);
-        }
+            free_pipe_heredoc(cmd->count_heredoc, cmd->pipe_heredoc);
     }
     else
     {
         if (contains_heredoc(cmd))
-        {
-            int i = 0;
-            while (i < count_heredoc)
-            {
-                free(pipe_heredoc[i]);
-                i++;
-            }
-            free(pipe_heredoc);
-        }
-
+            free_pipe_heredoc(cmd->count_heredoc, cmd->pipe_heredoc);
         free_tokens(cmd);
         if (tmp_cmd)
             ft_free(tmp_cmd);
-        cmd->state = 0;
-        set_state(cmd->state);
+        set_st(0);
         return;
     }
-    int i = 0;
-    while (i < cmd->len_tokens)
-    {
-        free(cmd->tokens[i]->value);
-        free(cmd->tokens[i]);
-        i++;
-    }
-    free(cmd->tokens);
+    free_tokens(cmd);
     if (tmp_cmd)
         ft_free(tmp_cmd);
-    cmd->state = 0;
-    set_state(cmd->state);
+    set_st(0);
     return ;
 }

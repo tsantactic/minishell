@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 16:41:01 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/26 11:56:13 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/27 16:26:32 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,11 +65,18 @@ typedef struct s_cmd
 	t_token **tokens;
 	t_token ***commands_arg;
 	t_token_type type;
+	t_token_type type_token;
 	char	*cmd;
 	char	**token_arg;
 	char	**args;
+	char	**lst_env;
 	int 	len_tokens;
 	int		len_arg;
+
+	int **pipe_heredoc;
+	int count_heredoc;
+	int stdout_backup;
+	int stdin_backup;
 
 	int		in_single_quote;
 	int		in_double_quote;
@@ -94,8 +101,8 @@ typedef struct s_cmd
 void		ft_free(char **str);
 char		*ft_strndup(const char *s, int n);
 char		*ft_strjoin_copy(char const *s1, char const *s2);
-
-void loop_readline(t_cmd *cmd, char **env);
+char	*count_len_cleaned(t_cmd *cmd, const char *str, char **env,t_token_type type);
+void 		loop_readline(t_cmd *cmd, char **env);
 int			lexing_arg(char *line, t_cmd *cmd, char **env);
 void		stock_token(t_cmd *cmd);
 int			count_arg(char *s, t_cmd *cmd);
@@ -103,9 +110,9 @@ void		stock_arg(char *s, t_cmd *cmd);
 char 		*remove_quotes_and_expand(t_cmd *cmd, const char *str, char **env, t_token_type type);
 
 int			check_error_arg(t_token **tokens, int len_tokens);
-int set_index_syntax(t_token **tokens, int len_tokens);
+int 		set_index_syntax(t_token **tokens, int len_tokens);
 
 void	sig_handler(int signum);
 void	sig_quit_handler(int signum);
-int set_state(int state);
+int set_st(int state);
 #endif

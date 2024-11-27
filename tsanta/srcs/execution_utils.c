@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 14:44:02 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/26 11:56:09 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/27 14:10:44 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,21 +122,18 @@ void	ft_execute_command(t_cmd *cmd, char *path, char **my_t_cmd, char **envp)
 			}
 			if (is_not_cmd == 1 && !is_not_dir)
 			{
-				ft_putstr_fd("': filename argument required\n.: usage: . filename [arguments]\n", 2);
-				cmd->state = 2;
-				set_state(cmd->state);
+				ft_putstr_fd("': filename argument required\n.: usage: . filename [arguments]\n", 2);				
+				set_st(2);
 			}
 			else if (is_not_cmd == 2 && !is_not_dir)
 			{
 				ft_putstr_fd("':command not found\n", 2);
-				cmd->state = 127;
-				set_state(cmd->state);
+				set_st(127);
 			}
 			else
 			{
 				ft_putstr_fd("': Is a directory\n", 2);
-				cmd->state = 126;
-				set_state(cmd->state);
+				set_st(126);
 			}
 		}
 		else
@@ -144,8 +141,7 @@ void	ft_execute_command(t_cmd *cmd, char *path, char **my_t_cmd, char **envp)
 			if(errno == 20)
 			{
 				ft_putstr_fd("': Not a directory\n", 2);
-				cmd->state = 126;
-				set_state(cmd->state);
+				set_st(126);
 			}
 			else if (errno == 2)
 			{
@@ -163,21 +159,19 @@ void	ft_execute_command(t_cmd *cmd, char *path, char **my_t_cmd, char **envp)
 				if (is_not_cmd)
 				{
 					ft_putstr_fd("': No such file or directory\n", 2);
-					cmd->state = 127;
-					set_state(cmd->state);
+					set_st(127);
 				}
 				else
 				{
 					ft_putstr_fd("': command not found\n", 2);
-					cmd->state = 127;
-					set_state(cmd->state);
+					set_st(127);
 				}
 			}
 		}
 	}
 	else
 	{
-		cmd->state = 0;
+		set_st(0);
 		int	i;
 
 		i = 0;

@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 09:08:16 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/25 15:45:11 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/27 18:48:08 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 t_cmd	*move_quote(t_cmd *cmd, char **env)
 {
 	char	*cleaned_arg;
-
 	cmd->is_empty = 0;
 	cmd->index = 0;
 	while (cmd->index < cmd->len_arg)
@@ -23,12 +22,12 @@ t_cmd	*move_quote(t_cmd *cmd, char **env)
 				cmd->tokens[cmd->index]->value, env,
 				cmd->tokens[cmd->index]->type);
 		if (cmd->is_empty && cmd->index < cmd->len_arg && cmd->tokens[cmd->index
-			- 1]->type == 2)
+			- 1]->type == 2 && cmd->tokens[cmd->index]->type == 3 && cmd->tokens[cmd->index]->in_quote == IN_QUOTE)
 		{
 			cmd->tokens[cmd->index]->type = 1;
 			cmd->is_empty = 0;
 		}
-		if (cmd->tokens[cmd->index]->type == 1 && ft_strlen(cleaned_arg) == 0
+		else if ((cmd->tokens[cmd->index]->type == 1 || cmd->tokens[cmd->index]->type == 3) && ft_strlen(cleaned_arg) == 0
 			&& cmd->tokens[cmd->index]->in_quote == NO_QUOTE)
 		{
 			cmd->tokens[cmd->index]->type = 2;
@@ -36,6 +35,23 @@ t_cmd	*move_quote(t_cmd *cmd, char **env)
 		}
 		free(cmd->tokens[cmd->index]->value);
 		cmd->tokens[cmd->index]->value = cleaned_arg;
+		cmd->index++;
+	}
+	cmd->is_cmd = 0;
+	cmd->index = 0;
+	while (cmd->index < cmd->len_arg)
+	{
+		if (cmd->tokens[cmd->index]->type == PIPE)
+		{
+			cmd->is_cmd = 0;
+		}
+		else if (cmd->tokens[cmd->index]->type == 1)
+		{
+			if (cmd->is_cmd == 0)
+				cmd->is_cmd = 1;
+			else
+				cmd->tokens[cmd->index]->type = 3;
+		}
 		cmd->index++;
 	}
 	return (cmd);

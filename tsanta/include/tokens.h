@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:35:49 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/23 10:11:49 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/27 18:48:13 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,5 +20,8 @@ void	free_tokens(t_cmd *cmd);
 void 	free_token_list(t_cmd *cmd);
 void    free_tokens_all(t_cmd *cmd);
 void 		free_tokens_and_args(t_cmd *cmd);
+void ft_free_token_cmd(t_cmd *cmd);
+void free_pipe_heredoc(int count_heredoc, int **pipe_heredoc);
+void free_commands(t_cmd *cmd);
 
 #endif

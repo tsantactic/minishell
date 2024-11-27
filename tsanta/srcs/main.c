@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 08:37:25 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/26 11:56:12 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/11/27 18:48:10 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void loop_readline(t_cmd *cmd, char **env)
 {
     char *input;
-
+	/*stock list_env = env*/
     while (1)
 	{
 		input = readline("$tambinin&&sandriam@minishell%> ");
@@ -46,11 +46,11 @@ void loop_readline(t_cmd *cmd, char **env)
 		}
         else if (tmp == -1)
             free_and_reinitialise(cmd);
-		printf("*******%d********\n", set_state(-1));
+		printf("...%d...\n", set_st(-1));
 		free(input);
 	}
 }
-int set_state(int nb)
+int set_st(int nb)
 {
 	static int i;
 	if (nb >= 0)
@@ -65,8 +65,7 @@ int main(int arg, char **argv, char **env)
 	(void)argv;
     signal(SIGINT, sig_handler);
 	signal(SIGQUIT, SIG_IGN);
-	cmd.state = 0;
-	set_state(cmd.state);
+	set_st(-1);
 	cmd.args = malloc(sizeof(char *) * INITIAL_ARG_SIZE);
 	if (!cmd.args)
 	{
@@ -77,5 +76,5 @@ int main(int arg, char **argv, char **env)
     loop_readline(&cmd, env);
     free(cmd.args);
     rl_clear_history();
-    return (0);
+    return (set_st(-1));
 }
