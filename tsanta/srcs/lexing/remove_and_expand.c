@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 17:59:52 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/02 11:15:23 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/10 13:59:42 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ void	add_all(size_t *indices, char *result, const char *str, t_cmd *cmd)
 			}
 			else
 			{
-				if (str[indices[0] + 1] == '?')
+				if (str[indices[0] + 1] == '?' && cmd->type_token != DELIMITER)
 				{
 					expand_status(indices, result);					
 				}

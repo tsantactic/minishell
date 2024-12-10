@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_export.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 10:19:55 by tambinin          #+#    #+#             */
-/*   Updated: 2024/11/29 16:45:07 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/04 17:40:55 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,33 +28,56 @@ int	is_valid_id(char *args)
 	}
 	return (1);
 }
-// Ajoute ou met à jour une variable dans la liste chaînée
+// Ajoute ou met à jour une variable 
 void update_or_add_variable(t_env **env, const char *var)
 {
     size_t name_len;
     t_env *current;
-    char *equals_pos;
+    char *equal_pos;
 
-    equals_pos = ft_strchr(var, '=');
-    if (!equals_pos) // Pas de "=", rien à faire
-        return;
-    name_len = equals_pos - var; // Longueur de la partie nom
+    equal_pos = ft_strchr(var, '=');
+    if (!equal_pos) // Pas de "=", rien à faire
+       name_len = ft_strlen(var); 
+    else
+        name_len = equal_pos - var; // Longueur de la partie nom
     current = *env;
-
     // Parcours pour trouver une variable existante
-    while (current)
+    while (current) 
     {
-        if (ft_strncmp(current->data, var, name_len) == 0 && current->data[name_len] == '=')
+        if (ft_strncmp(current->data, var, name_len) == 0 &&
+            (current->data[name_len] == '=' || current->data[name_len] == '\0'))
         {
-            free(current->data);           // Supprime l'entrée existante
-            current->data = ft_strdup(var); // Copie la nouvelle valeur
+            if (equal_pos)
+            {
+                free(current->data);           // Supprime l'entrée existante
+                current->data = ft_strdup(var); // Copie la nouvelle valeur
+                set_st(0);
+            }
             return;
         }
         current = current->next;
     }
-
-    // Si non trouvé, ajouter comme nouvelle variable
     add_env_node(env, (char *)var);
+    set_st(0);
+}
+
+void display_export(t_env *env)
+{
+    t_env *current = env;
+
+    while (current)
+    {
+        char *equal_pos = ft_strchr(current->data, '=');
+        if (equal_pos)
+        {
+            printf("declare -x %.*s", (int)(equal_pos - current->data), current->data); // avant le signe "=" -> VAR_NAME
+            printf("=\"%s\"\n", equal_pos + 1); // apres le signe "=" avec /"/" -> "value"
+        }
+        else
+            printf("declare -x %s\n", current->data); // Si pas de `=`, affiche uniquement le nom
+        current = current->next;
+    }
+    set_st(0);
 }
 
 void ft_export(char **args, t_env **env)
@@ -63,12 +86,7 @@ void ft_export(char **args, t_env **env)
 
     if (!args[1]) // Pas d'arguments : afficher l'environnement
     {
-        t_env *current = *env;
-        while (current)
-        {
-            printf("declare -x %s\n", current->data);
-            current = current->next;
-        }
+        display_export(*env);
         return;
     }
 
@@ -78,7 +96,12 @@ void ft_export(char **args, t_env **env)
         if (!equals_pos) // Pas de "=", juste un identifiant
         {
             if (!is_valid_id(args[i]))
-                fprintf(stderr, "export: '%s': not a valid identifier\n", args[i]);
+            {
+                set_st(1);
+                ft_putstr_fd("export: '", STDERR_FILENO);
+                ft_putstr_fd(args[i], STDERR_FILENO);
+                ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
+            }
             else
                 update_or_add_variable(env, args[i]);
         }
@@ -86,7 +109,12 @@ void ft_export(char **args, t_env **env)
         {
             char *name = ft_substr(args[i], 0, equals_pos - args[i]);
             if (!is_valid_id(name))
-                fprintf(stderr, "export: '%s': not a valid identifier\n", args[i]);
+            {
+                set_st(1);
+                ft_putstr_fd("export: '", STDERR_FILENO);
+                ft_putstr_fd(args[i], STDERR_FILENO);
+                ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
+            }
             else
                 update_or_add_variable(env, args[i]);
             free(name);

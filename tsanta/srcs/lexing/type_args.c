@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:46:48 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/29 10:22:57 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/09 18:39:59 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,30 @@ int	possible_quote_dollar(char *s)
 			is_ok = 0;
 			is_quote = 1;
 		}
+		if (s[i] == '$' && is_quote == 0)
+			is_ok = 1;
+		i++;
+	}
+	if (is_ok == 1 && is_quote == 0)
+		return (0);
+	if (is_ok == 0 && is_quote == 0)
+		return (2);
+	return (1);
+}
+
+int	possible_dollar(char *s)
+{
+	int	i;
+	int	is_ok;
+	int	is_quote;
+
+	i = 0;
+	is_ok = 0;
+	is_quote = 0;
+	if (s[0] == '\'')
+		is_quote = 1;
+	while (s[i])
+	{
 		if (s[i] == '$' && is_quote == 0)
 			is_ok = 1;
 		i++;
@@ -80,8 +104,16 @@ void	handle_redirects_type(t_cmd *cmd, t_token *token)
 }
 void	set_type_quote(char *value, t_token *token)
 {
+	if (possible_dollar(value) == 0)
+	{
+		token->type_env = IS_ENV;
+	}
+	else
+		token->type_env = -1;
 	if (possible_quote_dollar(value) == 1)
 		token->in_quote = IN_QUOTE;
+	else if (possible_quote_dollar(value) == 2)
+		token->in_quote = SIMPLE;
 	else
 		token->in_quote = NO_QUOTE;
 }

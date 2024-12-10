@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 08:37:25 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/04 13:48:25 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/09 14:34:23 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void loop_readline(t_cmd *cmd, char **env)
 		{
 			free_new_env(&env_list);
 			rl_clear_history();
-			printf("exit\n");
+			ft_putstr_fd("exit\n", 2);
 			free(input);
 			return ;
 		}

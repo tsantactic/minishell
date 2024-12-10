@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 09:40:01 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/04 13:48:17 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/04 16:31:10 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,10 @@ void	sig_handler(int signum)
 	if (signum == SIGINT)
 	{
 		if (set_sig_new_line(-1) == 0)
+		{
 			write(1, "\n", 1);
+			rl_replace_line("", 0);
+		}
 		else
 		{
 			rl_replace_line("", 0);

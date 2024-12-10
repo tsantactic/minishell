@@ -6,14 +6,14 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 16:41:01 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/04 13:48:18 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/10 17:48:54 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "../Libft/libft.h"
+# include "../libft/libft.h"
 # include <dirent.h>
 # include <errno.h>
 # include <fcntl.h>
@@ -51,13 +51,24 @@ typedef enum e_token_type
 	DELIMITER,
 	NO_QUOTE,
 	IN_QUOTE,
+	SIMPLE,
+	IS_ENV,
+	DELIMITER_WITH_QUOTE,
+	DELIMITER_NO_QUOTE
 } t_token_type;
 
 typedef struct s_token
 {
     char *value;
+
+	int len_cmd_arg;
+	char *command_value;
+	char **tmp_cmd_arg;
+
     t_token_type type;
+	t_token_type type_env;
 	t_token_type in_quote;
+	t_token_type type_quote_delim;
 } t_token;
 
 typedef	struct s_env
@@ -79,6 +90,9 @@ typedef struct s_cmd
 	char	**lst_env;
 	int 	len_tokens;
 	int		len_arg;
+	char 	*tmp_value;
+	int 	type_del;
+	int len_cmd;
 
 	int **pipe_heredoc;
 	int tmp_pipe_heredoc;
@@ -109,6 +123,7 @@ typedef struct s_cmd
 }			t_cmd;
 
 void		ft_free(char **str);
+void		ft_free_dp(char **str, int len);
 char		*ft_strndup(const char *s, int n);
 char		*ft_strjoin_copy(char const *s1, char const *s2);
 char	*count_len_cleaned(t_cmd *cmd, const char *str, char **env,t_token_type type);
@@ -118,7 +133,7 @@ void		stock_token(t_cmd *cmd);
 int			count_arg(char *s, t_cmd *cmd);
 void		stock_arg(char *s, t_cmd *cmd);
 char 		*remove_quotes_and_expand(t_cmd *cmd, const char *str, t_env **env_list, t_token_type type);
-
+void	toggle_quotes(t_cmd *cmd, char ch);
 int			check_error_arg(t_token **tokens, int len_tokens);
 int 		set_index_syntax(t_token **tokens, int len_tokens);
 

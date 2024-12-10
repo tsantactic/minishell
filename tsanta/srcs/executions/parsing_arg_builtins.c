@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:26:57 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/04 13:48:16 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/06 17:02:21 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,11 @@ void execute_heredoc_builtins(t_cmd *cmd, int **pipe_heredoc, int count_heredoc,
                 delimiter = cmd->tokens[i + 1]->value;
                 pipe(pipe_heredoc[heredoc_index]);
                 loop_heredoc_blt(delimiter, pipe_heredoc[heredoc_index], cmd);
+                if (set_sig_heredoc(-1) == 1)
+                {
+                    close(pipe_heredoc[heredoc_index][0]);
+                    break;
+                }
                 if (heredoc_index + 1 == count_heredoc)
                 {
                     //(void)*temp_pipe_heredoc;
@@ -132,7 +137,7 @@ void parsing_arg_with_builtins(t_cmd *cmd, t_env **env)
     char **tmp_cmd = NULL;
     int len_command = 0;
     char *command = NULL;
-    count_command_arg(cmd, &len_command);
+    count_command_arg_blt(cmd, &len_command);
     tmp_cmd = malloc(sizeof(char *) * (len_command + 1));
     if (tmp_cmd == NULL)
     {
@@ -142,25 +147,47 @@ void parsing_arg_with_builtins(t_cmd *cmd, t_env **env)
             set_sig_heredoc(0);
         return;
     }
-    command = copy_command_arg(cmd, tmp_cmd, command);
+    command = copy_command_arg_blt(cmd, tmp_cmd, command);
     if (command)
     {
         char *extracted_command = extract_command_bin(command);
         if (is_builtin(extracted_command))
         {
-            (void)env;            
+            (void)env;
+            free(tmp_cmd[0]);
+            tmp_cmd[0] = extracted_command;
+            free(command);
             if (ft_strcmp(tmp_cmd[0], "cd") == 0 && set_sig_heredoc(-1) != 1)
-            {
-                chdir(tmp_cmd[1]);
-            }
+                ft_cd(tmp_cmd, env);
             if (ft_strcmp(tmp_cmd[0], "pwd") == 0 && set_sig_heredoc(-1) != 1)
+                ft_pwd(tmp_cmd);
+            if (ft_strcmp(tmp_cmd[0], "echo") == 0 && set_sig_heredoc(-1) != 1)
+                ft_echo(tmp_cmd, env);
+            if (ft_strcmp(tmp_cmd[0], "env") == 0 && set_sig_heredoc(-1) != 1)
+                ft_env(tmp_cmd, env);
+            if (ft_strcmp(tmp_cmd[0], "export") == 0 && set_sig_heredoc(-1) != 1)
+                ft_export(tmp_cmd, env);
+            if (ft_strcmp(tmp_cmd[0], "exit") == 0 && set_sig_heredoc(-1) != 1)
             {
-                char    cwd[1024];
-                if (getcwd(cwd, sizeof(cwd)) != NULL)
-                    ft_putendl_fd(cwd, 1);
-                else
-                    perror("pwd");
+                ft_exit(tmp_cmd);
+                if (set_st(-1) != 1)
+                {
+                    dup2(cmd->stdout_backup, STDOUT_FILENO);
+                    dup2(cmd->stdin_backup, STDIN_FILENO);
+                    close(cmd->stdout_backup);
+                    close(cmd->stdin_backup);
+                    if (tmp_cmd)
+                        ft_free(tmp_cmd);
+                    if (contains_heredoc(cmd))
+                        free_pipe_heredoc(cmd->count_heredoc, cmd->pipe_heredoc);
+                    ft_free_token_cmd(cmd);
+                    free_new_env(env);
+                    free_tokens(cmd);
+                    exit(set_st(-1));
+                }
             }
+            if (ft_strcmp(tmp_cmd[0], "unset") == 0 && set_sig_heredoc(-1) != 1)
+                ft_unset(tmp_cmd, env);
             if (set_sig_heredoc(-1) == 1)
             {
                 set_sig_heredoc(0);
@@ -170,8 +197,6 @@ void parsing_arg_with_builtins(t_cmd *cmd, t_env **env)
             dup2(cmd->stdin_backup, STDIN_FILENO);
             close(cmd->stdout_backup);
             close(cmd->stdin_backup);
-            free(command);
-            free(extracted_command);
             if (tmp_cmd)
                 ft_free(tmp_cmd);
             if (contains_heredoc(cmd))
@@ -193,9 +218,4 @@ void parsing_arg_with_builtins(t_cmd *cmd, t_env **env)
         set_st(0);
         return;
     }
-    free_tokens(cmd);
-    if (tmp_cmd)
-        ft_free(tmp_cmd);
-    set_st(0);
-    return ;
 }

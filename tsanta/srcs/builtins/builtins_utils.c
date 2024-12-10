@@ -6,54 +6,46 @@
 /*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 13:38:53 by tambinin          #+#    #+#             */
-/*   Updated: 2024/11/29 16:34:49 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/04 13:23:39 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-// Met à jour une variable dans la liste d'environnement
-void update_env_variable(const char *name, const char *value, t_env **env_list)
+void update_env_var(const char *var_name, const char *value, t_env **env_list)
 {
+    size_t len = ft_strlen(var_name);
     t_env *current = *env_list;
-    size_t name_len = ft_strlen(name);
-    char *new_entry = NULL;
+    char *new_data;
 
-    // Crée une nouvelle chaîne "VAR=VALUE"
-    new_entry = malloc(name_len + ft_strlen(value) + 2); // "name=value\0"
-    if (!new_entry)
-    {
-        perror("malloc");
-        return;
-    }
-    ft_strlcpy(new_entry, name, name_len + 1);
-    ft_strlcat(new_entry, "=", name_len + 2);
-    ft_strlcat(new_entry, value, name_len + ft_strlen(value) + 2);
-
-    // Parcours pour trouver et remplacer la variable existante
     while (current)
     {
-        if (ft_strncmp(current->data, name, name_len) == 0
-                && current->data[name_len] == '=')
+        if (ft_strncmp(current->data, var_name, len) == 0 && current->data[len] == '=')
         {
             free(current->data);
-            current->data = new_entry;
+            new_data = ft_strjoin3(var_name, "=", value);
+            current->data = new_data;
             return;
         }
         current = current->next;
     }
+    // Si la variable n'existe pas -> l'ajouter
+    new_data = ft_strjoin3(var_name, "=", value);
+    add_env_node(env_list, new_data);
+}
 
-    // Si la variable n'existe pas, ajoutez-la
-    t_env *new_node = malloc(sizeof(t_env));
-    if (!new_node)
-    {
-        free(new_entry);
-        perror("malloc");
-        return;
-    }
-    new_node->data = new_entry;
-    new_node->next = *env_list;
-    *env_list = new_node;
+char *ft_strjoin3(const char *s1, const char *s2, const char *s3)
+{
+    char *result;
+    size_t len = ft_strlen(s1) + ft_strlen(s2) + ft_strlen(s3);
+
+    result = malloc(len + 1);
+    if (!result)
+        return (NULL);
+    ft_strlcpy(result, s1, len + 1);
+    ft_strlcat(result, s2, len + 1);
+    ft_strlcat(result, s3, len + 1);
+    return (result);
 }
 
 

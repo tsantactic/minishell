@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+         #
+#    By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/07 16:29:47 by sandriam          #+#    #+#              #
-#    Updated: 2024/11/29 11:10:32 by sandriam         ###   ########.fr        #
+#    Updated: 2024/12/04 09:50:06 by tambinin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,14 +25,15 @@ SRCS = ft_memset.c ft_bzero.c ft_memcpy.c ft_memmove.c \
        ft_tolower.c ft_calloc.c ft_strdup.c ft_itoa.c ft_substr.c \
        ft_strjoin.c ft_strtrim.c ft_split.c ft_putchar_fd.c \
        ft_putnbr_fd.c ft_putstr_fd.c ft_strmapi.c ft_striteri.c \
-	   ft_strmapi.c ft_putendl_fd.c ft_strcmp.c ft_strtok.c \
-          ft_strcpy.c ft_strcat.c ft_strncpy.c
+	ft_strmapi.c ft_putendl_fd.c ft_strcmp.c ft_strtok.c \
+       ft_strcpy.c ft_strcat.c ft_strncpy.c \
 
 OBJS = ${SRCS:.c=.o}
-.o:.c
+
+%.o:%.c
 	@${CC} ${CFLAGS} -c $< -o ${<:.c=.o}
 $(NAME): $(OBJS)
-		${AR} ${NAME} ${OBJS}
+		@${AR} ${NAME} ${OBJS}
 all: ${NAME}
 clean:
 	@$(RM) $(OBJS)

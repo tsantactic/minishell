@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_echo.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/21 12:58:19 by tambinin          #+#    #+#             */
-/*   Updated: 2024/11/22 09:55:37 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/04 17:33:51 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 
-// N.B : gestion \/$ \\/$
-void    ft_echo(char **args)
+void    ft_echo(char **args, t_env **env)
 {
     int new_line = 1; // echo sans "-n" -> saut a la ligne
     int i = 1;
@@ -34,13 +33,20 @@ void    ft_echo(char **args)
     //parcourt les arg restants
     while (args[i])
     {
-        char    *arg = args[i];
-
-        ft_putstr_fd(arg, 1);
+        // if (args[i][0] == '$')
+        // {
+        //     const char  *value = get_env_value(args[i] + 1, env);
+        //     ft_putstr_fd((char *)value, STDOUT_FILENO);
+        // }
+        // else
+        (void)env;
+        ft_putstr_fd(args[i], STDOUT_FILENO);
 		if (args[i + 1])
 			write(1, " ", 1);
 		i++;
     }
     if (new_line)
 		write(1, "\n", 1);
+    set_st(0);
+    return ;
 }

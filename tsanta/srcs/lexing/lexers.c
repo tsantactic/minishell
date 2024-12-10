@@ -6,11 +6,12 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 09:08:16 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/03 18:49:27 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/10 15:54:45 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
+
 void last_type(t_cmd *cmd)
 {
 	cmd->is_cmd = 0;
@@ -30,6 +31,22 @@ void last_type(t_cmd *cmd)
 		}
 	}
 }
+
+void check_quote_delimiter(char *value, t_token_type *type_quote_delim)
+{
+	int i = 0;
+	*type_quote_delim = -1;
+	while(i < (int)ft_strlen(value))
+	{
+		if (value[i] == '\'' || value[i] == '"')
+		{
+			*type_quote_delim = DELIMITER_WITH_QUOTE;
+		}		
+		i++;
+	}
+	if (*type_quote_delim != DELIMITER_WITH_QUOTE)
+		*type_quote_delim = DELIMITER_NO_QUOTE;
+}
 t_cmd	*move_quote(t_cmd *cmd, t_env *env_list)
 {
 	char	*cleaned_arg;
@@ -37,11 +54,12 @@ t_cmd	*move_quote(t_cmd *cmd, t_env *env_list)
 	cmd->index = -1;
 	while (++cmd->index < cmd->len_arg)
 	{
+		check_quote_delimiter(cmd->tokens[cmd->index]->value, &cmd->tokens[cmd->index]->type_quote_delim);
 		cleaned_arg = remove_quotes_and_expand(cmd,
 				cmd->tokens[cmd->index]->value,  &env_list,
 				cmd->tokens[cmd->index]->type);
 		if (cmd->is_empty && cmd->index < cmd->len_arg && cmd->tokens[cmd->index
-			- 1]->type == 2 && cmd->tokens[cmd->index]->type == 3 && cmd->tokens[cmd->index]->in_quote == IN_QUOTE)
+			- 1]->type == 2 && cmd->tokens[cmd->index]->type == 3 && (cmd->tokens[cmd->index]->in_quote == SIMPLE || cmd->tokens[cmd->index]->in_quote == IN_QUOTE))
 		{
 			cmd->tokens[cmd->index]->type = 1;
 			cmd->is_empty = 0;
@@ -96,8 +114,15 @@ int lexing_arg(char *line, t_cmd *cmd, t_env **env)
         cmd = move_quote(cmd, *env);
 		// for (int i = 0; i < cmd->len_tokens; i++)
 		// {
-		// 	printf("Token Value: [%s], Type: %d\n", cmd->tokens[i]->value,
-		// 		cmd->tokens[i]->type);
+		// 	printf("Token Value: [%s], Type: %d\n", cmd->tokens[i]->value, cmd->tokens[i]->type);
+		// 	if (cmd->tokens[i]->type_env == 15)
+		// 	{
+		// 		printf("IS_ENV\n");
+		// 	}
+		// 	else
+		// 	{
+		// 		printf("non IS_ENV\n");
+		// 	}
 		// }
 		return (0);
     }

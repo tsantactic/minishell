@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/06 12:44:17 by tambinin          #+#    #+#             */
-/*   Updated: 2024/11/29 10:38:28 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/10 17:03:40 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,28 @@ void	ft_free(char **str)
 		return ;
 	while (str[i])
 	{
-		free(str[i]);
+		if (str[i])
+			free(str[i]);
 		i++;
 	}
 	free(str);
 }
 
+void	ft_free_dp(char **str, int len)
+{
+	int	i;
+
+	i = 0;
+	if (!str)
+		return ;
+	while (i < len)
+	{
+		if (str[i])
+			free(str[i]);
+		i++;
+	}
+	free(str);
+}
 char	*ft_strndup(const char *s, int n)
 {
 	char	*dup;
