@@ -34,7 +34,8 @@ void ft_cd(char **args, t_env **env)
     else if (chdir(args[1]) != 0) // Changer de répertoire
     {
         set_st(1);
-        perror("cd");
+        ft_putstr_fd("cd: ", 2);
+        perror(args[1]);
         return;
     }
     set_st(0);

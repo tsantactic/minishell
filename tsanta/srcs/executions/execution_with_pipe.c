@@ -29,9 +29,24 @@ void count_cmd_per_arg(t_cmd *cmd)
         {
             if (cmd->commands_arg[i][j]->type == ARG || cmd->commands_arg[i][j]->type == CMD)
             {
-                if (cmd->commands_arg[i][j]->type == CMD)
-                    cmd->commands_arg[i][0]->command_value = ft_strdup(cmd->commands_arg[i][j]->value); // command_value = "ls" commande pple
-                len++;
+                if (cmd->commands_arg[i][j]->type_env == IS_ENV && ft_strchr(cmd->commands_arg[i][j]->value, ' ') != 0)
+                {
+                    char **split_env = ft_split(cmd->commands_arg[i][j]->value, ' ');
+                    int count = 0;
+                    while (split_env && split_env[count])
+                    {
+                        free(split_env[count]);
+                        count++;
+                    }
+                    free(split_env);
+                    len += count;
+                }
+                else
+                {
+                    if (cmd->commands_arg[i][j]->type == CMD)
+                        cmd->commands_arg[i][0]->command_value = ft_strdup(cmd->commands_arg[i][j]->value); // command_value = "ls" commande pple
+                    len++;
+                }
             }
             len_cmd++;
             j++;
@@ -45,8 +60,22 @@ void count_cmd_per_arg(t_cmd *cmd)
         {
             if (cmd->commands_arg[i][j]->type == ARG || cmd->commands_arg[i][j]->type == CMD)
             {
-                /* mbola tsy ampy anle IS_ENV : export lol="ls -a" -> $lol*/
-                cmd->commands_arg[i][0]->tmp_cmd_arg[k++] = ft_strdup(cmd->commands_arg[i][j]->value); // tmp_cmd_arg = ["ls", "-l"] char **s_token
+                if (cmd->commands_arg[i][j]->type_env == IS_ENV && ft_strchr(cmd->commands_arg[i][j]->value, ' ') != 0)
+                {
+                    char **split_env = ft_split(cmd->commands_arg[i][j]->value, ' ');
+                    int index = 0;
+                    while (split_env && split_env[index])
+                    {
+                        cmd->commands_arg[i][0]->tmp_cmd_arg[k++] = ft_strdup(split_env[index]);
+                        if (index == 0)
+                            cmd->commands_arg[i][0]->command_value = ft_strdup(split_env[0]);
+                        free(split_env[index]);
+                        index++;
+                    }
+                    free(split_env);
+                }
+                else
+                    cmd->commands_arg[i][0]->tmp_cmd_arg[k++] = ft_strdup(cmd->commands_arg[i][j]->value); // tmp_cmd_arg = ["ls", "-l"] char **s_token
             }
             j++;
         }
@@ -109,7 +138,7 @@ void	handle_pipe(t_cmd *cmd, t_env **env)
 	char	**args;
 	int		fd[2 * cmd->nb_pipe];
 	pid_t	pid;
-
+    int stat;
 	i = 0;
 	// creer tous les pipes
 	while (i < cmd->nb_pipe)
@@ -133,6 +162,7 @@ void	handle_pipe(t_cmd *cmd, t_env **env)
 		}
 		if (pid == 0)
 		{
+            signal(SIGINT, SIG_DFL);
 			if (i > 0)
             {
                 if (dup2(fd[(i - 1) * 2], STDIN_FILENO) == -1)
@@ -142,7 +172,8 @@ void	handle_pipe(t_cmd *cmd, t_env **env)
                 }
             }
             
-            if (i < cmd->nb_pipe) {
+            if (i < cmd->nb_pipe)
+            {
                 if (dup2(fd[i * 2 + 1], STDOUT_FILENO) == -1)
                 {
                     perror("dup2 output");
@@ -193,17 +224,18 @@ void	handle_pipe(t_cmd *cmd, t_env **env)
                         {
                             ft_putendl_fd(extract_command, 2);
                             ft_putendl_fd("minishell: command not found", STDERR_FILENO);
-                            // perror("execve");
                             ft_free(envp);
                             free(path);
                             ft_free_token_cmd(cmd);
-                            free_new_env(env);                        
+                            free_new_env(env);                    
                             free_commands(cmd);
                             free_tokens(cmd);
                             free(extract_command);
                             free(cmd->commands_arg);
-                            exit(EXIT_FAILURE);
+                            exit(set_st(127));
                         }
+                        else
+                            set_st(0);
                     }
                     else
                     {
@@ -215,7 +247,7 @@ void	handle_pipe(t_cmd *cmd, t_env **env)
                         free_commands(cmd);
                         free_tokens(cmd);
                         free(cmd->commands_arg);
-                        exit(EXIT_FAILURE);
+                        exit(set_st(127));
                     }   
                 }
 			}
@@ -231,10 +263,30 @@ void	handle_pipe(t_cmd *cmd, t_env **env)
                 free_commands(cmd);
                 free_tokens(cmd);
                 free(cmd->commands_arg);
-                exit(EXIT_FAILURE);
+                exit(set_st(-1));
             }
-
 		}
+        else
+        {
+            if (waitpid(pid, &stat, 0) == -1)
+            {
+                kill(0, SIGINT);
+                break;
+            }
+            if (i == cmd->nb_pipe)
+            {
+                if (WIFEXITED(stat))
+                {
+                    set_st(WEXITSTATUS(stat));
+                }
+                else if (WIFSIGNALED(stat))
+                {
+                    set_st(WTERMSIG(stat)+128);
+                    if (set_st(WTERMSIG(stat)+128) == 131)
+                        printf("quit (core dumped)\n");
+                }
+            }
+        }
 		i++;
 	}
 	i = 0;
@@ -243,13 +295,6 @@ void	handle_pipe(t_cmd *cmd, t_env **env)
 		close(fd[i]);
 		i++;
 	}
-	i = 0;
-	while (i <= cmd->nb_pipe)
-	{
-		wait(NULL);
-		i++;
-	}
-		
 }
 
 void execute_with_pipes(t_cmd *cmd, t_env *env[])
