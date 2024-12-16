@@ -26,7 +26,7 @@ const char	*get_env_value(const char *var, t_env **env_list)
 			return (&current->data[len + 1]);
 		current = current->next;
 	}
-	return ("");
+	return (NULL);
 }
 void	toggle_quotes(t_cmd *cmd, char ch)
 {

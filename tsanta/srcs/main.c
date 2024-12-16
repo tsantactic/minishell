@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 08:37:25 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/09 14:34:23 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/12 11:32:10 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ int main(int arg, char **argv, char **env)
 		printf("Failed to allocate memory for cmd.args\n");
 		return (EXIT_FAILURE);
 	}
-	memset(cmd.args, 0, sizeof(char *) * INITIAL_ARG_SIZE);
+	ft_memset(cmd.args, 0, sizeof(char *) * INITIAL_ARG_SIZE);
     loop_readline(&cmd, env);
     free(cmd.args);
     rl_clear_history();

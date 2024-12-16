@@ -29,7 +29,7 @@ void ft_env(char **argv, t_env **env)
 		return ;
 	}
 	curr = *env;
-	while (curr->next)
+	while (curr)
 	{
 		if (ft_strchr(curr->data, '=') != 0)
 			ft_putendl_fd(curr->data, STDOUT_FILENO);

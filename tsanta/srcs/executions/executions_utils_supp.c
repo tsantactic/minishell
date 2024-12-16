@@ -53,7 +53,7 @@ void count_command_arg(t_cmd *cmd, int *len_command)
         i++;
     }
 }
-char  *copy_command_arg_blt(t_cmd *cmd, char **my_t_cmd, char *command)
+char *copy_command_arg_blt(t_cmd *cmd, char **my_t_cmd, char *command)
 {
     int j = 0;
     int k = 0;
@@ -68,10 +68,10 @@ char  *copy_command_arg_blt(t_cmd *cmd, char **my_t_cmd, char *command)
         k++;
     }
     my_t_cmd[j] = NULL;
-    return(command);
+    return (command);
 }
 
-char  *copy_command(t_cmd *cmd, char *command)
+char *copy_command(t_cmd *cmd, char *command)
 {
     int k = 0;
     while (k < cmd->len_tokens)
@@ -83,9 +83,9 @@ char  *copy_command(t_cmd *cmd, char *command)
         }
         k++;
     }
-    return(command);
+    return (command);
 }
-char  *copy_command_arg(t_cmd *cmd, char **my_t_cmd, char *command)
+char *copy_command_arg(t_cmd *cmd, char **my_t_cmd, char *command)
 {
     int j = 0;
     int k = 0;
@@ -118,45 +118,45 @@ char  *copy_command_arg(t_cmd *cmd, char **my_t_cmd, char *command)
         k++;
     }
     my_t_cmd[j] = NULL;
-    return(command);
+    return (command);
 }
-int contains_bin(const char *command)
+int contains_bin(char *command)
 {
-    return (ft_strncmp((char*)command, "/bin/", 5) == 0 || ft_strncmp((char*)command, "/usr/bin/", 9) == 0);
+    if ((ft_strncmp(command, "/bin/", 5) == 0 || ft_strncmp(command, "/usr/bin/", 9) == 0))
+    {
+        return(1);
+    }
+    return (0);
 }
 
-char *extract_command_bin(const char *command)
+char *extract_command_bin(char *command)
 {
-    const char *start;
-    
     if (contains_bin(command))
     {
-        if (command[4] == '/')
+        if (ft_strncmp(command, "/bin/", 5) == 0)
         {
-            start = command + 5;
+            return (command + 5);
         }
-        else
+        else if (ft_strncmp(command, "/usr/bin/", 9) == 0)
         {
-            start = command + 9;
-        }   
-        return ft_strdup(start);
+            return (command + 9);
+        }
     }
     return ft_strdup(command);
 }
 
 int check_env(t_env **envp, char *value)
 {
-  	t_env *curr = NULL;
+    t_env *curr = NULL;
 
-	curr = *envp;
-	while (curr->next)
-	{
-		if (ft_strncmp(curr->data, value, 5) == 0)
-		{
-			return (1);
-		}
-		curr = curr->next;
-	}
-	return (0);
+    curr = *envp;
+    while (curr)
+    {
+        if (ft_strncmp(curr->data, value, ft_strlen(value)) == 0)
+        {
+            return (1);
+        }
+        curr = curr->next;
+    }
+    return (0);
 }
-

@@ -46,7 +46,7 @@ t_env	*copy_env_to_list(char **env)
 
 	while (env[i])
 	{
-		add_env_node(&env_list, env[i]); // ajoutte chaque variable a la liste
+		add_env_node(&env_list, env[i]);
 		i++;
 	}
 	return (env_list);

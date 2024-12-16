@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 16:41:01 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/10 17:48:54 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/12 11:31:09 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ typedef struct s_token
     char *value;
 
 	int len_cmd_arg;
+	int total_len;
 	char *command_value;
 	char **tmp_cmd_arg;
 
@@ -151,4 +152,8 @@ void	free_env_list(t_env *lst);
 t_env	*copy_env_to_list(char **env);
 char	**env_list_to_array(t_env *lst);
 void	free_new_env(t_env **env);
+
+void parse_exec_redir_pipe(t_token **commands_arg, int len);
+int contains_redir_pipe(t_token **token, int len);
+int redirection_exec_pipe(t_token **tokens, int len);
 #endif

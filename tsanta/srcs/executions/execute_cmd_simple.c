@@ -6,22 +6,17 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/09 11:25:57 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/10 15:54:47 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/12 11:20:52 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
-
-void handle_stat_error(char **my_t_cmd, t_cmd *cmd);
-void handle_errno_case(char **my_t_cmd, t_cmd *cmd);
-void cleanup_resources(t_cmd *cmd, char **env);
-void execute_and_handle_error(t_cmd *cmd, char *path, char **my_t_cmd, char **env);
-void check_and_set_exit_status(char **my_t_cmd, int is_not_cmd, int is_not_dir);
+const char	*get_env_value(const char *var, t_env **env_list);
 
 void ft_execute_command(t_cmd *cmd, char *path, char **my_t_cmd, t_env **envp)
 {
     char **env = env_list_to_array(*envp);
-
+    
     execute_and_handle_error(cmd, path, my_t_cmd, env);
 }
 
@@ -32,7 +27,7 @@ void execute_and_handle_error(t_cmd *cmd, char *path, char **my_t_cmd, char **en
         struct stat path_stat;
         ft_putstr_fd("minishell: '", 2);
         ft_putstr_fd(my_t_cmd[0], 2);
-
+        
         if (stat(my_t_cmd[0], &path_stat) == 0)
             handle_stat_error(my_t_cmd, cmd);
         else

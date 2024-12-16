@@ -178,7 +178,11 @@ void loop_heredoc(char *delimiter, int *pipefd, t_cmd *cmd, int type_quote_delim
             break;
         }
         if (type_quote_delim == DELIMITER_NO_QUOTE)
-            input = expand_heredoc(input, cmd);
+        {
+            char *expanded = expand_heredoc(input, cmd);
+            free(input);
+            input = expanded;
+        }
         ft_putendl_fd(input, pipefd[1]);
         free(input);
     }
