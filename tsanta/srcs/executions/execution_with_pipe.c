@@ -137,7 +137,7 @@ void	handle_pipe(t_cmd *cmd, t_env **env)
 	char	**envp;
 	char	**args;
 	int		fd[2 * cmd->nb_pipe];
-	pid_t	pid;
+	pid_t	pid[cmd->nb_pipe];
     int stat;
 	i = 0;
 	// creer tous les pipes
@@ -154,13 +154,13 @@ void	handle_pipe(t_cmd *cmd, t_env **env)
 	i = 0;
 	while (i <= cmd->nb_pipe)
 	{
-		pid = fork();
-		if (pid == -1)
+		pid[i] = fork();
+		if (pid[i] == -1)
 		{
 			perror("fork");
 			exit(EXIT_FAILURE);
 		}
-		if (pid == 0)
+		if (pid[i] == 0)
 		{
             signal(SIGINT, SIG_DFL);
 			if (i > 0)
@@ -266,33 +266,31 @@ void	handle_pipe(t_cmd *cmd, t_env **env)
                 exit(set_st(-1));
             }
 		}
-        else
-        {
-            if (waitpid(pid, &stat, 0) == -1)
-            {
-                kill(0, SIGINT);
-                break;
-            }
-            if (i == cmd->nb_pipe)
-            {
-                if (WIFEXITED(stat))
-                {
-                    set_st(WEXITSTATUS(stat));
-                }
-                else if (WIFSIGNALED(stat))
-                {
-                    set_st(WTERMSIG(stat)+128);
-                    if (set_st(WTERMSIG(stat)+128) == 131)
-                        printf("quit (core dumped)\n");
-                }
-            }
-        }
 		i++;
 	}
 	i = 0;
 	while (i < 2 * cmd->nb_pipe)
 	{
 		close(fd[i]);
+		i++;
+	}
+    i = 0;
+	while (i <= cmd->nb_pipe)
+	{
+        waitpid(pid[i], &stat, 0);
+        if (WIFEXITED(stat))
+        {
+            set_st(WEXITSTATUS(stat));
+        }
+        else if (WIFSIGNALED(stat))
+        {
+            set_st(WTERMSIG(stat)+128);
+            if (set_st(WTERMSIG(stat)+128) == 131)
+            {
+                printf("quit (core dumped)\n");
+                break ;
+            }
+        }
 		i++;
 	}
 }
