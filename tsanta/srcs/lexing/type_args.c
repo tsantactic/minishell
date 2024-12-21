@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   type_args.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 15:46:48 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/09 18:39:59 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/13 16:48:17 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 int	possible_quote_dollar(char *s)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/19 10:06:45 by sandriam          #+#    #+#             */
-/*   Updated: 2024/10/07 07:44:40 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 15:50:39 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,26 @@ int	ft_atoi(const char *nptr)
 	}
 	str_final *= signe;
 	return (str_final);
+}
+long	ft_atol(const char *str)
+{
+	long	result;
+	int		sign;
+	result = 0;
+	sign = 1;
+	if (*str == '-')
+	{
+		sign = -1;
+		str++;
+	}
+	else if (*str == '+')
+		str++;
+	while (*str)
+	{
+		if (!ft_isdigit(*str))
+			return (-13464121485485);
+		result = result * 10 + (*str - '0');
+		str++;
+	}
+	return (sign * result);
 }

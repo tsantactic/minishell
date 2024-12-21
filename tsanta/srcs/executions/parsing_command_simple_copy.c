@@ -1,16 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_command_simple.c                           :+:      :+:    :+:   */
+/*   parsing_command_simple_copy.c                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 11:00:30 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/12 11:53:54 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 14:18:48 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
+
 void parsing_argument_simple(t_cmd *cmd, t_env **env)
 {
     /*parse redirection heredoc*/

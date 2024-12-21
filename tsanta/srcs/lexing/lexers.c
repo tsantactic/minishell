@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   lexers.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 09:08:16 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/10 15:54:45 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 17:02:42 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void last_type(t_cmd *cmd)
 {
@@ -94,13 +94,15 @@ int lexing_arg(char *line, t_cmd *cmd, t_env **env)
 	{
 		if (i == -1)
 		{
+			set_st(2);
 			ft_putendl_fd("minishell: syntax error with unclosed quotes", 2);
 			return (-2);
 		}
 		else if (i == -2)
 		{
+			set_st(2);
 			ft_putendl_fd("minishell: syntax error near unexpected token `|'", 2);
-			return (-1);
+			return (-2);
 		}
 	}
 	else

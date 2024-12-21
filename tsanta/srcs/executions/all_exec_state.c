@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   all_exec_state.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 10:21:38 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/12 10:40:24 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/20 13:59:39 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void path_is_here(char *path, t_env **env, char **tmp_cmd, char *command, t_cmd *cmd)
 {
@@ -123,6 +123,7 @@ void path_is_here(char *path, t_env **env, char **tmp_cmd, char *command, t_cmd 
                 }
             }
         }
+        free(path);
     }
 }
 
@@ -330,6 +331,7 @@ void path_not_set(char *command, t_env **env, char **tmp_cmd)
                         ft_putstr_fd("minishell: '", 2);
                         ft_putstr_fd(command, 2);
                         ft_putstr_fd("': Is a directory\n", 2);
+                        ft_free(env_list);
                         set_st(126);
                     }
                 }   
@@ -359,12 +361,12 @@ void path_not_set(char *command, t_env **env, char **tmp_cmd)
                 }
                 if (is_not_cmd)
                 {
-                    ft_putstr_fd("': No such file or directory\n", 2);
+                    ft_putstr_fd("': No such file or directoryy\n", 2);
                     set_st(127);
                 }
                 else
                 {
-                    ft_putstr_fd("': No such file or directory\n", 2);
+                    ft_putstr_fd("': No such file or directoryy\n", 2);
                     set_st(127);                            
                 }
             }

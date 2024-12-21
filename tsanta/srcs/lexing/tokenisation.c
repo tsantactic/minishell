@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   tokenisation.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/29 14:53:33 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/29 10:22:56 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/13 16:48:13 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 int	contains_quotes(const char *arg)
 {

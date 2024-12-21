@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   syntax.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 10:38:31 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/29 10:22:55 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 16:56:12 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

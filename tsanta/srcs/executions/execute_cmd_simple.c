@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   execute_cmd_simple.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/09 11:25:57 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/12 11:20:52 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/20 13:59:43 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
+
 const char	*get_env_value(const char *var, t_env **env_list);
 
 void ft_execute_command(t_cmd *cmd, char *path, char **my_t_cmd, t_env **envp)
@@ -27,7 +28,6 @@ void execute_and_handle_error(t_cmd *cmd, char *path, char **my_t_cmd, char **en
         struct stat path_stat;
         ft_putstr_fd("minishell: '", 2);
         ft_putstr_fd(my_t_cmd[0], 2);
-        
         if (stat(my_t_cmd[0], &path_stat) == 0)
             handle_stat_error(my_t_cmd, cmd);
         else
@@ -125,7 +125,7 @@ void check_and_set_exit_status(char **my_t_cmd, int is_not_cmd, int is_not_dir)
 void cleanup_resources(t_cmd *cmd, char **env)
 {
     int i = 0;
-
+    
     while (i < cmd->len_tokens)
     {
         free(cmd->tokens[i]->value);

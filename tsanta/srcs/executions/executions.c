@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   executions.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 10:06:14 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/12 11:32:47 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 17:02:44 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void	count_pipe(t_cmd *cmd)
 {
@@ -85,10 +85,10 @@ void execute_possibility_heredoc(t_cmd *cmd, int tmp)
 
 void exec_alls(t_cmd *cmd, t_env **env)
 {
-    count_pipe(cmd);
 	int tmp = 0;
 	set_sig_new_line(0);
 	tmp = check_error_arg(cmd->tokens, cmd->len_tokens);
+    count_pipe(cmd);
     if (cmd->nb_pipe == 0 && cmd->len_arg > 0)
 	{
 		if (tmp > 0)

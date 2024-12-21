@@ -3,24 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_pwd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 10:21:58 by tambinin          #+#    #+#             */
-/*   Updated: 2024/12/06 16:48:56 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 13:41:05 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void    ft_pwd(char **argv)
 {
-    // getcwd : pour obtenir le chemin absolue du repertoire
     char cwd[1024];
 
-    if (argv[1] != NULL)
+    if (argv[1] && argv[1][0] == '-')
     {
         set_st(1);
-        ft_putendl_fd("no arguments are allowed", STDERR_FILENO);
+        ft_putendl_fd("no option is allowed", STDERR_FILENO);
         return;
     }
     if (getcwd(cwd, sizeof(cwd)) != NULL)

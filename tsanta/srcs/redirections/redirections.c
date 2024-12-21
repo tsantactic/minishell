@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/05 10:43:42 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/05 10:59:48 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 14:48:26 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void parse_exec_redirection(t_cmd *cmd)
 {
@@ -40,7 +40,7 @@ int redirection_exec(t_cmd *cmd)
             {
 				set_st(1);
                 perror(cmd->tokens[k + 1]->value);
-                return (1);
+                return (2);
             }
             dup2(fd, 1);
             close(fd);
@@ -75,7 +75,7 @@ int redirection_exec(t_cmd *cmd)
             {
 				set_st(1);
                 perror(cmd->tokens[k + 1]->value);
-                return (1);
+                return (2);
             }
             dup2(fd, 1);
             close(fd);
@@ -101,3 +101,4 @@ int contains_redirection(t_cmd *cmd)
     }
     return (0);
 }
+

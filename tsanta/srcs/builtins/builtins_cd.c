@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_cd.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 10:20:23 by tambinin          #+#    #+#             */
-/*   Updated: 2024/12/04 18:00:51 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 13:42:26 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void ft_cd(char **args, t_env **env)
 {
@@ -19,6 +19,12 @@ void ft_cd(char **args, t_env **env)
 
     // Récupérer l'ancien PWD
     old_pwd = get_env_value("PWD", env);
+    if (args[1] && args[2])
+    {
+        ft_putendl_fd(" too many arguments", STDERR_FILENO);
+        set_st(1);
+        return ;
+    }
 
     // Si aucun argument ou "~", aller dans le home directory
     if (!args[1] || ft_strcmp(args[1], "~") == 0)
@@ -28,15 +34,14 @@ void ft_cd(char **args, t_env **env)
         {
             set_st(1);
             perror("cd");
-            return;
+            return ;
         }
     }
     else if (chdir(args[1]) != 0) // Changer de répertoire
     {
         set_st(1);
-        ft_putstr_fd("cd: ", 2);
-        perror(args[1]);
-        return;
+        perror("cd");
+        return ;
     }
     set_st(0);
     // Mettre à jour PWD et OLDPWD

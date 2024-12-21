@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/05 10:29:04 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/09 18:56:35 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/16 15:21:49 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 /****heredoc****/
 void parse_exec_heredoc(t_cmd *cmd)
@@ -148,7 +148,7 @@ char *expand_heredoc(char *input, t_cmd *cmd)
 void loop_heredoc(char *delimiter, int *pipefd, t_cmd *cmd, int type_quote_delim)
 {
     char *input = NULL;
-    set_sig_heredoc(0);
+    set_sig_heredoc(0);// si = 1 (ctrl + C)-> tapaka daholo ny ao ariana
     cmd->stdin_heredoc = dup(STDIN_FILENO);
     while (1)
     {
@@ -161,7 +161,7 @@ void loop_heredoc(char *delimiter, int *pipefd, t_cmd *cmd, int type_quote_delim
             close(pipefd[1]);
             break;
         }
-        if (!input)
+        if (!input) // ctrl + D
         {
             ft_putstr_fd("minishel : warning: here-document at this line delimited by end-of-file (wanted :'",2);
             ft_putstr_fd(delimiter, 2);
@@ -199,7 +199,7 @@ void execute_heredoc(t_cmd *cmd, int **pipe_heredoc, int count_heredoc)
     i = 0;
     while (i < cmd->len_tokens)
     {
-        cmd->type_del = -1;
+        cmd->type_del = -1; // pour les variables d'environnement
         if (cmd->tokens[i]->type == REDIR_HEREDOC)
         {
             if (cmd->tokens[i + 1]->type == DELIMITER)

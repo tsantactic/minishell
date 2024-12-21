@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   execution_simple_cmd.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 10:26:02 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/12 11:33:16 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 14:19:25 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 int is_builtin(char *command)
 {

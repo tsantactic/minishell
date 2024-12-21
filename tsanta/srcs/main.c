@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 08:37:25 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/12 11:32:10 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 17:03:17 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void loop_readline(t_cmd *cmd, char **env)
 			continue ;
 		}
 		add_history(input);
-		if (strncmp(input, "exit", 5) == 0)
+		if (ft_strncmp(input, "exit", 5) == 0)
 		{
 			free_new_env(&env_list);
 			rl_clear_history();

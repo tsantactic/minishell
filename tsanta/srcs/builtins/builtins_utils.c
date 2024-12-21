@@ -6,11 +6,11 @@
 /*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 13:38:53 by tambinin          #+#    #+#             */
-/*   Updated: 2024/12/04 13:23:39 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/13 16:42:28 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void update_env_var(const char *var_name, const char *value, t_env **env_list)
 {

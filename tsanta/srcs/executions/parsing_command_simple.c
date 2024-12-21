@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_command_simple.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 11:00:30 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/12 11:53:54 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/20 13:59:54 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
+
 void parsing_argument_simple(t_cmd *cmd, t_env **env)
 {
     /*parse redirection heredoc*/
@@ -50,8 +51,7 @@ void parsing_argument_simple(t_cmd *cmd, t_env **env)
         {
             path_not_set(command, env, tmp_cmd);            
         }
-        if (path)
-            free(path);
+        
         free(command);
         free(extracted_command);
         if (contains_heredoc(cmd))

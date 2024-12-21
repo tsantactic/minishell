@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 16:41:01 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/12 11:31:09 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/20 15:14:08 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,13 +61,19 @@ typedef struct s_token
 {
     char *value;
 
-	int len_cmd_arg;
-	int total_len;
-	char *command_value;
-	char **tmp_cmd_arg;
+	int len_cmd_arg; // taille par commande entre pipe arg + cmd
+	int	total_len; // taille ana segment 1
+	char *command_value; // cmd par pipe : ls
+	char **tmp_cmd_arg; // cmd + arg : ls -a
+	int pipe_heredoc[2];
+	int count_heredoc;
+	int fd_heredoc;
+
+	int stdin_set;
+	int stdout_set;
 
     t_token_type type;
-	t_token_type type_env;
+	t_token_type type_env; // 
 	t_token_type in_quote;
 	t_token_type type_quote_delim;
 } t_token;
@@ -89,13 +95,16 @@ typedef struct s_cmd
 	char	**token_arg;
 	char	**args;
 	char	**lst_env;
+	char	*path_cmd;
 	int 	len_tokens;
 	int		len_arg;
 	char 	*tmp_value;
 	int 	type_del;
 	int len_cmd;
 
+	pid_t	*pid;
 	int **pipe_heredoc;
+	int **fd_pipe;
 	int tmp_pipe_heredoc;
 	int count_heredoc;
 	int stdout_backup;
@@ -121,6 +130,8 @@ typedef struct s_cmd
 	int is_empty;
 	int index_command;
 
+	int flag_exit;
+
 }			t_cmd;
 
 void		ft_free(char **str);
@@ -138,6 +149,7 @@ void	toggle_quotes(t_cmd *cmd, char ch);
 int			check_error_arg(t_token **tokens, int len_tokens);
 int 		set_index_syntax(t_token **tokens, int len_tokens);
 
+
 void	sig_handler(int signum);
 void	sig_quit_handler(int signum);
 void	sig_quit_slash(int signum);
@@ -153,7 +165,19 @@ t_env	*copy_env_to_list(char **env);
 char	**env_list_to_array(t_env *lst);
 void	free_new_env(t_env **env);
 
-void parse_exec_redir_pipe(t_token **commands_arg, int len);
+// redirection with pipe
+int	parse_exec_redir_pipe(t_token **commands_arg, int len);
 int contains_redir_pipe(t_token **token, int len);
 int redirection_exec_pipe(t_token **tokens, int len);
+
+//heredoc with pipe
+void    parse_exec_heredoc_pipe(t_token **commands_arg, int len);
+int contains_heredoc_pipe(t_token **token, int len);
+int count_heredoc_pipe(t_token **token, int count_heredoc, int len);
+void	execute_pipe_heredoc(t_token **token, int *pipe_heredoc, int len, int len_heredoc);
+
+int add_stdin(t_token **token, int len);
+void check_stdin(t_cmd *cmd);
+int add_stdout(t_token **token, int len);
+void check_stdout(t_cmd *cmd);
 #endif

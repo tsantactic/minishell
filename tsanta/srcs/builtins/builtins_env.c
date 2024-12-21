@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_env.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 10:22:27 by tambinin          #+#    #+#             */
-/*   Updated: 2024/12/04 17:50:45 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/13 16:41:57 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 void ft_env(char **argv, t_env **env)
 {

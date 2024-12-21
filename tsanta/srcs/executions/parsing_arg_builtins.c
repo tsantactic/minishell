@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_arg_builtins.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 09:26:57 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/06 17:02:21 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/17 16:44:46 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
+
 void loop_heredoc_blt(char *delimiter, int *pipefd, t_cmd *cmd)
 {
     char *input = NULL;
@@ -118,6 +119,9 @@ int exec_redir_builtins(t_cmd *cmd)
     }
     return (0);
 }
+
+
+
 void parsing_arg_with_builtins(t_cmd *cmd, t_env **env)
 {
     /*parse redirection heredoc*/
@@ -169,7 +173,7 @@ void parsing_arg_with_builtins(t_cmd *cmd, t_env **env)
                 ft_export(tmp_cmd, env);
             if (ft_strcmp(tmp_cmd[0], "exit") == 0 && set_sig_heredoc(-1) != 1)
             {
-                ft_exit(tmp_cmd);
+                ft_exit_simple(cmd, tmp_cmd, env);                
                 if (set_st(-1) != 1)
                 {
                     dup2(cmd->stdout_backup, STDOUT_FILENO);

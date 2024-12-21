@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   executions_utils_supp.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 11:40:16 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/10 17:48:51 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/20 13:47:19 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 /****command****/
 void count_command_arg_blt(t_cmd *cmd, int *len_command)

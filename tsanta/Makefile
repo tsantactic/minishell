@@ -15,12 +15,12 @@ SRCS =	srcs/main.c \
 		srcs/lexing/tokenisation.c srcs/lexing/lexers.c srcs/lexing/stock_args.c srcs/lexing/lexing_utils.c srcs/lexing/type_args.c srcs/lexing/remove_and_expand.c \
 		srcs/executions/executions.c srcs/executions/execution_with_pipe.c srcs/executions/execution_utils.c srcs/executions/executions_utils_supp.c\
 		srcs/executions/execution_simple_cmd.c srcs/executions/parsing_command_simple.c srcs/executions/parsing_arg_builtins.c \
-		srcs/executions/execute_cmd_simple.c srcs/executions/all_exec_state.c\
+		srcs/executions/execute_cmd_simple.c srcs/executions/all_exec_state.c srcs/executions/check_stdin_stdout.c\
 		srcs/syntax.c srcs/utils_functions.c \
 		srcs/env_list.c \
 		srcs/redirections/heredoc.c \
 		srcs/redirections/redirections.c \
-		srcs/redirections/redirections_with_pipe.c \
+		srcs/redirections/redirections_with_pipe.c srcs/redirections/heredoc_with_pipe.c \
 		srcs/builtins/builtins_cd.c srcs/builtins/builtins_echo.c srcs/builtins/builtins_pwd.c \
 		srcs/builtins/builtins_exit.c srcs/builtins/builtins_export.c srcs/builtins/builtins_unset.c \
 		srcs/builtins/builtins_utils.c srcs/builtins/builtins_env.c \

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   stock_args.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
+/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/20 12:04:16 by sandriam          #+#    #+#             */
-/*   Updated: 2024/11/29 10:22:53 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/13 16:48:08 by tambinin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "../../include/minishell.h"
 
 int	is_space(int i, char *s)
 {
