@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_exit.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/19 10:19:58 by tambinin          #+#    #+#             */
-/*   Updated: 2024/12/21 11:34:31 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/24 13:59:29 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,7 @@ void	exit_pipe_utils(char **args, t_cmd *cmd, t_env **env, long exit_code)
 	{
 		exit_code = ft_atol(args[1]);
 		set_st(exit_code);
-		ft_free_token_cmd(cmd);
-		free_tokens(cmd);
-		free_commands(cmd);
-		free(cmd->commands_arg);
-		free_new_env(env);
+		free_exit_pipe(cmd, env);
 		exit(exit_code);
 	}
 }
@@ -48,6 +44,8 @@ void	ft_exit_pipe(char **args, t_cmd *cmd, t_env **env, char *extract_cmd)
 	{
 		ft_putendl_fd("exit", 1);
 		rl_clear_history();
+		free(extract_cmd);
+		free_exit_pipe(cmd, env);
 		exit(0);
 	}
 	else
@@ -59,24 +57,6 @@ void	ft_exit_pipe(char **args, t_cmd *cmd, t_env **env, char *extract_cmd)
 	set_st(-1);
 	rl_clear_history();
 	return ;
-}
-
-void	free_exit_simple(char **args, t_cmd *cmd, t_env **env, long exit_code)
-{
-	exit_code = ft_atol(args[1]);
-	set_st(exit_code);
-	dup2(cmd->stdout_backup, STDOUT_FILENO);
-	dup2(cmd->stdin_backup, STDIN_FILENO);
-	close(cmd->stdout_backup);
-	close(cmd->stdin_backup);
-	if (args)
-		ft_free(args);
-	if (contains_heredoc(cmd))
-		free_pipe_heredoc(cmd->count_heredoc, cmd->pipe_heredoc);
-	ft_free_token_cmd(cmd);
-	free_new_env(env);
-	free_tokens(cmd);
-	exit(exit_code);
 }
 
 void	exit_simple_utils(t_cmd *cmd, char **args, t_env **env, long exit_code)
@@ -94,9 +74,7 @@ void	exit_simple_utils(t_cmd *cmd, char **args, t_env **env, long exit_code)
 		return ;
 	}
 	else
-	{
 		free_exit_simple(args, cmd, env, exit_code);
-	}
 }
 
 void	ft_exit_simple(t_cmd *cmd, char **args, t_env **env)
@@ -108,6 +86,7 @@ void	ft_exit_simple(t_cmd *cmd, char **args, t_env **env)
 	{
 		ft_putendl_fd("exit", 1);
 		rl_clear_history();
+		free_exit_no_arg(cmd, args, env);
 		exit(0);
 	}
 	else
@@ -116,6 +95,5 @@ void	ft_exit_simple(t_cmd *cmd, char **args, t_env **env)
 		exit_simple_utils(cmd, args, env, exit_code);
 	}
 	set_st(-1);
-	rl_clear_history();
 	return ;
 }

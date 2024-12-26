@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 09:16:45 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/24 09:16:46 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/26 14:23:04 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ int	checks_if_stdin(int i, t_token **token, int len)
 			is_last_stdin = 1;
 		k++;
 	}
+	if (is_last_stdin == 0 && !token[0]->tp_val)
+		is_last_stdin = 1;
 	return (is_last_stdin);
 }
 
@@ -66,6 +68,7 @@ int	check_signal_exit_hd(char *input, int *fd, int is_last_stdin,
 			free(input);
 		if (is_last_stdin == 0)
 			close(fd[1]);
+		open("/dev/tty", O_RDONLY);
 		return (1);
 	}
 	if (!input)

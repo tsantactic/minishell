@@ -6,7 +6,7 @@
 /*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/24 09:16:48 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/24 09:16:49 by sandriam         ###   ########.fr       */
+/*   Updated: 2024/12/24 14:31:53 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,6 @@ void	execute_heredoc_loop(t_cmd *cmd, int **pipe_heredoc, int heredoc_index,
 	delimiter = NULL;
 	delimiter = cmd->tokens[i + 1]->value;
 	pipe(pipe_heredoc[heredoc_index]);
-	cmd->type_del = cmd->tokens[i + 1]->type_quote_delim;
+	cmd->type_del = cmd->tokens[i + 1]->type_delim;
 	loop_heredoc(delimiter, pipe_heredoc[heredoc_index], cmd, cmd->type_del);
 }

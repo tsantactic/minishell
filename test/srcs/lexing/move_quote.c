@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   move_quote.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/22 15:02:54 by tambinin          #+#    #+#             */
-/*   Updated: 2024/12/22 15:27:14 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/24 14:30:10 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	process_token_quote(t_cmd *cmd, t_env *env_list, int index)
 	char	*cleaned_arg;
 
 	check_quote_delimiter(cmd->tokens[index]->value,
-		&cmd->tokens[index]->type_quote_delim);
+		&cmd->tokens[index]->type_delim);
 	cleaned_arg = remove_quotes_and_expand(cmd, cmd->tokens[index]->value,
 			&env_list, cmd->tokens[index]->type);
 	cmd = handle_empty_or_quote(cmd, cleaned_arg, index);

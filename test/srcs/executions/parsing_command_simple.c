@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_command_simple.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 11:00:30 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/20 13:59:54 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/25 10:53:07 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

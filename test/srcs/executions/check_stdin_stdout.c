@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   check_stdin_stdout.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/21 14:23:59 by tambinin          #+#    #+#             */
-/*   Updated: 2024/12/21 14:27:29 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/24 15:49:13 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,17 +45,17 @@ void	check_stdin(t_cmd *cmd)
 	i = 0;
 	while (i < num_pipes)
 	{
-		cmd->commands_arg[i][0]->stdin_set = 0;
-		if (add_stdin(cmd->commands_arg[i],
-				cmd->commands_arg[i][0]->total_len) == 1)
-			cmd->commands_arg[i][0]->stdin_set = 1;
+		cmd->tp_arg[i][0]->stdin_set = 0;
+		if (add_stdin(cmd->tp_arg[i],
+				cmd->tp_arg[i][0]->total_len) == 1)
+			cmd->tp_arg[i][0]->stdin_set = 1;
 		i++;
 	}
-	if (add_stdin(cmd->commands_arg[num_pipes],
-			cmd->commands_arg[num_pipes][0]->total_len))
-		cmd->commands_arg[num_pipes][0]->stdin_set = 1;
+	if (add_stdin(cmd->tp_arg[num_pipes],
+			cmd->tp_arg[num_pipes][0]->total_len))
+		cmd->tp_arg[num_pipes][0]->stdin_set = 1;
 	else
-		cmd->commands_arg[num_pipes][0]->stdin_set = 0;
+		cmd->tp_arg[num_pipes][0]->stdin_set = 0;
 }
 
 int	add_stdout(t_token **token, int len)
@@ -89,15 +89,15 @@ void	check_stdout(t_cmd *cmd)
 	i = 0;
 	while (i < num_pipes)
 	{
-		cmd->commands_arg[i][0]->stdout_set = 0;
-		if (add_stdout(cmd->commands_arg[i],
-				cmd->commands_arg[i][0]->total_len) == 1)
-			cmd->commands_arg[i][0]->stdout_set = 1;
+		cmd->tp_arg[i][0]->stdout_set = 0;
+		if (add_stdout(cmd->tp_arg[i],
+				cmd->tp_arg[i][0]->total_len) == 1)
+			cmd->tp_arg[i][0]->stdout_set = 1;
 		i++;
 	}
-	if (add_stdout(cmd->commands_arg[num_pipes],
-			cmd->commands_arg[num_pipes][0]->total_len) == 1)
-		cmd->commands_arg[num_pipes][0]->stdout_set = 1;
+	if (add_stdout(cmd->tp_arg[num_pipes],
+			cmd->tp_arg[num_pipes][0]->total_len) == 1)
+		cmd->tp_arg[num_pipes][0]->stdout_set = 1;
 	else
-		cmd->commands_arg[num_pipes][0]->stdout_set = 0;
+		cmd->tp_arg[num_pipes][0]->stdout_set = 0;
 }

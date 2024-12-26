@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   redirections_with_pipe.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 11:23:13 by tambinin          #+#    #+#             */
-/*   Updated: 2024/12/23 16:04:18 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/24 15:49:13 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
-int	parse_exec_redir_pipe(t_token **commands_arg, int len)
+int	parse_exec_redir_pipe(t_token **tp_arg, int len)
 {
-	if (contains_redir_pipe(commands_arg, len))
+	if (contains_redir_pipe(tp_arg, len))
 	{
-		if (redirection_exec_pipe(commands_arg, len) == 2)
+		if (redirection_exec_pipe(tp_arg, len) == 2)
 			return (1);
 	}
 	return (0);

@@ -1,3 +1,0 @@
-make re
-clear
-valgrind --suppressions=/home/sandriam/Documents/42/work/minishell_42/perso/tools/readline.supp --leak-check=full --show-leak-kinds=all --track-fds=yes ./minishell

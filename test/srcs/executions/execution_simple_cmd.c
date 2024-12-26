@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_simple_cmd.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 10:26:02 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/21 15:20:41 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/25 10:36:36 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

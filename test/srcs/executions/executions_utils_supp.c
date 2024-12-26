@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executions_utils_supp.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/06 11:40:16 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/20 13:47:19 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/24 15:48:13 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ char	*copy_command_arg_blt(t_cmd *cmd, char **my_t_cmd, char *command)
 	return (command);
 }
 
-char	*add_value_env(char *value, int *j, char **my_t_cmd, char *command)
+char	*add_value(char *value, int *j, char **my_t_cmd, char *command)
 {
 	char	**split_env;
 	int		i;
@@ -102,7 +102,7 @@ char	*copy_command_arg(t_cmd *cmd, char **my_t_cmd, char *command)
 		{
 			if (cmd->tokens[k]->type_env == IS_ENV
 				&& ft_strchr(cmd->tokens[k]->value, ' ') != 0)
-				command = add_value_env(cmd->tokens[k]->value, &j, my_t_cmd,
+				command = add_value(cmd->tokens[k]->value, &j, my_t_cmd,
 						command);
 			else
 			{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signal.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tambinin <tambinin@student.42antananari    +#+  +:+       +#+        */
+/*   By: sandriam <sandriam@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 09:40:01 by sandriam          #+#    #+#             */
-/*   Updated: 2024/12/23 10:41:30 by tambinin         ###   ########.fr       */
+/*   Updated: 2024/12/26 14:22:41 by sandriam         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
